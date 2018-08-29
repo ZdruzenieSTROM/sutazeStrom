@@ -18,4 +18,5 @@ from django.urls import path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-]
+    path('', include('competition.urls', namespace='competition')),
+]  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
