@@ -122,6 +122,6 @@ STATIC_ROOT = '/var/www/repreU17.pythonanywhere.com/static/'
 STATIC_ROOT = os.path.dirname(os.path.abspath(__file__))
 ##################
 
-admin.site.site_url = ''
+admin.site.site_url = '/index/'
 
 STATIC_URL = '/static/'
