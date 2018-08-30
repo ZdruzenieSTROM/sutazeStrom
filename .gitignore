@@ -1,5 +1,5 @@
 ########## Own gitignore ##########
-odc_server/local-settings.py
+odc_server/local_set.py
 ###################################
 
 ########## General python gitignore ##########

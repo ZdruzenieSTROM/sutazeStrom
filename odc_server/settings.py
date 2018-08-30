@@ -106,7 +106,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-from odc_server.local_settings import *
+from odc_server.local_set import *
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
