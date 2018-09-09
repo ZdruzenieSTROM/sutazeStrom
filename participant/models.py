@@ -4,6 +4,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Team(models.Model):
     name = models.CharField(max_length=200)
+    number = models.PositiveSmallIntegerField(validators=[MinValueValidator(100), MaxValueValidator(999)])
 
     school = models.ForeignKey('School', on_delete=models.CASCADE)
 
@@ -18,7 +19,7 @@ class Participant(models.Model):
 
     team = models.ForeignKey('Team', on_delete=models.CASCADE)
 
-    school_class = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(9)])
+    school_class = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(9)])
 
     def __str__(self):
         return '{} {}, {}'.format(self.first_name, self.last_name, self.team.school.name)
