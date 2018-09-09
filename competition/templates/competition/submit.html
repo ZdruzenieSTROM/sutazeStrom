@@ -18,3 +18,17 @@
     {{ form.as_p }}
   </form>
 {% endblock %}
+
+{% block lateJS %}
+  <script>
+    var input = document.getElementById("barcode_input"),
+      focuser = function () {
+          input.focus();
+      };
+
+    focuser();
+    input.onblur = function () {
+      setTimeout(focuser, 0);
+    };
+  </script>
+{% endblock %}
