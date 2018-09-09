@@ -1,15 +1,13 @@
-{% extends 'competition/base.html' %}
+{% extends 'base.html' %}
 
-{% block title %}
-  <title>Domov</title>
-{% endblock %}
+{% block title %}Udalosti{% endblock %}
 
 {% block content %}
-  <h1>Ako to funguje</h1>
-  <p>
-    Na všetko musíš byť prihlásený. Po vytvorení súťaže v administrátorskom
-    rozhraní sa môžeš prekliknúť na záložku súťaž a tam skenovať čiarové kódy.
-    To bude tímom pridávať vyriešené príklady. Počas súťaže v záložke výsledky
-    uvidíš priebežné výsledky, ktoré môžeš na konci generovať ako LaTeX dokument.
-  </p>
+<h1>Udalosti</h1>
+
+<ul>
+  {% for event in events %}
+    <li><a href="{% url 'competition:event' event.pk %}">{{ event }}</a></li>
+  {% endfor %}
+</ul>
 {% endblock %}

@@ -1,10 +1,11 @@
-from django.urls import path, include
+from django.urls import path
 
-from . import views
+from .views import EventListView, EventDetailView, submit
 
 app_name = 'competition'
 
 urlpatterns = [
-    path('index/', views.index, name='index'),
-    path('logout/', views.log_out, name='log_out'),
+    path('', EventListView.as_view(), name='index'),
+    path('<int:pk>/', EventDetailView.as_view(), name='event'),
+    path('<int:pk>/submit', submit, name='submit'),
 ]

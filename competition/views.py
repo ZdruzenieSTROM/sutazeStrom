@@ -1,19 +1,35 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.views.generic import ListView, DetailView
 
-from django.contrib import admin
-from django.contrib.auth import logout
-from django.contrib.auth.decorators import login_required
-from django.contrib.admin.views.decorators import staff_member_required
+from .models import Event, Solution, Problem
+from participant.models import Team
+from .forms import SubmitForm
 
-from django.contrib.auth.models import User
-from django.contrib.sessions.models import Session
-from .models import *
+class EventListView(ListView):
+    model = Event
+    template_name = 'competition/index.html'
+    context_object_name = 'events'
 
-def index(request):
-    template = 'competition/index.html'
-    return render(request, template, {})
+class EventDetailView(DetailView):
+    model = Event
+    template_name = 'competition/event.html'
+    context_object_name = 'event'
 
-def log_out(request):
-    logout(request)
-    return redirect('competition:index')
+def submit(request, pk):
+    event = Event.objects.get(pk=pk)
+
+    if request.method == 'POST':
+        form = SubmitForm(request.POST)
+
+        if form.is_valid():
+            team = Team.objects.get(pk=int(form.cleaned_data['code'][:3]))
+            problem = Problem.objects.get(competition=event.competition, position=int(form.cleaned_data['code'][3:]))
+
+            Solution.objects.create(event=event, problem=problem, team=team)
+
+            return redirect('competition:submit', pk=pk)
+
+    else:
+        form = SubmitForm()
+
+    return render(request, 'competition/submit.html', {'form': form, 'event': event})
