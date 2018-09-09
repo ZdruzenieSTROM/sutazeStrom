@@ -23,7 +23,7 @@ def submit(request, pk):
 
         if form.is_valid():
             team = Team.objects.get(pk=int(form.cleaned_data['code'][:3]))
-            problem = Problem.objects.get(competition=event.competition, position=int(form.cleaned_data['code'][3:]))
+            problem = Problem.objects.get(event=event, position=int(form.cleaned_data['code'][3:]))
 
             Solution.objects.create(event=event, problem=problem, team=team)
 
