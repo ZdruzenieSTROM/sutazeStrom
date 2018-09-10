@@ -1,30 +1,29 @@
 {% extends 'base.html' %}
 
+{% load staticfiles %}
+
 {% block title %}{{ event }} &ndash; Odovzdaj{% endblock %}
 
-{% block content %}
-{% if messages %}
-<ul>
-  {% for message in messages %}<li class="{% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</li>{% endfor %}
-</ul>
-{% endif %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'submit.css' %}">
+{% endblock %}
 
-<form action="{% url 'competition:submit' event.pk %}" method="POST" autocomplete="off">
-  {% csrf_token %}
-  {{ form.as_p }}
-</form>
+{% block content %}
+  {% if messages %}
+    {% for message in messages %}
+      <div id="{% if message.tags %}{{ message.tags }}{% endif %}" class="message">
+        {{ message }}
+        <button type="button" onclick="close_this('{% if message.tags %}{{ message.tags }}{% endif %}');" class="close_alert {% if message.tags %}{{ message.tags }}{% endif %}">&#x2716;</button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form id="barform" action="{% url 'competition:submit' event.pk %}" method="POST" autocomplete="off">
+    {% csrf_token %}
+    {{ form.as_p }}
+  </form>
 {% endblock %}
 
 {% block lateJS %}
-  <script>
-    var input = document.getElementById("barcode_input"),
-      focuser = function () {
-          input.focus();
-      };
-
-    focuser();
-    input.onblur = function () {
-      setTimeout(focuser, 0);
-    };
-  </script>
+  <script type="text/javascript" src="{% static 'submit.js' %}"></script>
 {% endblock %}
