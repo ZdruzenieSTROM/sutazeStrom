@@ -1,5 +1,6 @@
-from django.db import models
 from django.core.validators import MinValueValidator
+from django.db import models
+
 
 class Problem(models.Model):
     position = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
@@ -7,7 +8,7 @@ class Problem(models.Model):
     event = models.ForeignKey('Event', on_delete=models.CASCADE)
 
     def __str__(self):
-        return '{}, úloha {}'.format(self.event.name, self.position)
+        return '{}, úloha {}'.format(self.event, self.position)
 
 class Solution(models.Model):
     event = models.ForeignKey('Event', on_delete=models.CASCADE)
@@ -25,4 +26,4 @@ class Event(models.Model):
     team_members = models.PositiveSmallIntegerField()
 
     def __str__(self):
-        return self.name
+        return '{} {}'.format(self.name, self.date.year)

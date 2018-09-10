@@ -3,20 +3,16 @@
 {% block title %}{{ event }} &ndash; Odovzdaj{% endblock %}
 
 {% block content %}
-  {% if error %}
-    <p id="error" class="message">
-      <strong>Chyba!</strong> Čiarový kód nebol úspešne prečítaný. Skús to znova.
-    </p>
-  {% endif %}
-  {% if success %}
-    <p id="success" class="message">
-      <strong>OK!</strong> Riešenie bolo úspešne nahrané.
-    </p>
-  {% endif %}
-  <form action="{% url 'competition:submit' event.pk %}" method="POST" autocomplete="off">
-    {% csrf_token %}
-    {{ form.as_p }}
-  </form>
+{% if messages %}
+<ul>
+  {% for message in messages %}<li class="{% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</li>{% endfor %}
+</ul>
+{% endif %}
+
+<form action="{% url 'competition:submit' event.pk %}" method="POST" autocomplete="off">
+  {% csrf_token %}
+  {{ form.as_p }}
+</form>
 {% endblock %}
 
 {% block lateJS %}

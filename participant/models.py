@@ -11,7 +11,7 @@ class Team(models.Model):
     event = models.ForeignKey('competition.Event', on_delete=models.CASCADE)
 
     def __str__(self):
-        return '{}, {}'.format(self.name, self.school.name)
+        return '{}, {}'.format(self.name, self.school)
 
 class Participant(models.Model):
     first_name = models.CharField(max_length=100)
@@ -31,4 +31,4 @@ class School(models.Model):
     postal_code = models.CharField(max_length=6)
 
     def __str__(self):
-        return '{}, {}, {} {}'.format(self.name, self.address, self.postal_code, self.city)
+        return '{} {}, {} {}'.format(self.name, self.address, self.postal_code, self.city)

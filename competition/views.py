@@ -1,12 +1,14 @@
-from django.shortcuts import render, redirect
-from django.views.generic import ListView, DetailView
+from functools import reduce
 
-from .models import Event, Solution, Problem
+from django.contrib import messages
+from django.shortcuts import redirect, render
+from django.views.generic import DetailView, ListView
+
 from participant.models import Team
-from .forms import SubmitForm
 
-# 5 digits, working as control sum
-control = [5, 1, 9, 3, 7]
+from .forms import SubmitForm
+from .models import Event, Problem, Solution
+
 
 class EventListView(ListView):
     model = Event
@@ -20,51 +22,40 @@ class EventDetailView(DetailView):
 
 def submit(request, pk):
     event = Event.objects.get(pk=pk)
-    template = 'competition/submit.html'
+    template_name = 'competition/submit.html'
 
     if request.method == 'POST':
         form = SubmitForm(request.POST)
 
         if form.is_valid():
+            code = form.cleaned_data['code']
+
+            convert = lambda l: reduce(lambda p, n: p*10 + n, l)
+            number, position = convert(code[:3]), convert(code[3:])
+
             try:
-                barcode = form.cleaned_data['code']
-            except(IndexError):
-                form = SubmitForm()
-                return render(request, template, {'error':True, 'form': form, 'event': event})
+                team = Team.objects.get(number=number)
+                problem = Problem.objects.get( event=event, position=position)
 
-            if len(barcode) == 6:
-                barcode = barcode[:5]
-                try:
-                    control_digit = int(form.cleaned_data['code'][-1])
-                    control_sum = int(barcode[0])*control[0] + int(barcode[1])*control[1] + int(barcode[2])*control[2] + int(barcode[3])*control[3] + int(barcode[4])*control[4]
-                except(ValueError):
-                    form = SubmitForm()
-                    return render(request, template, {'error':True, 'form': form, 'event': event})
+            except Team.DoesNotExist:
+                messages.add_message(request, messages.ERROR, 'Kód neobsahuje platný tím')
 
-                if control_digit == (control_sum % 10):
-                    #team = Team.objects.get(number=int(barcode[:3]))
-                    #problem = Problem.objects.get(event=event, position=int(barcode[3:5]))
-
-                    #Solution.objects.create(event=event, problem=problem, team=team)
-
-                    request.session['success'] = True
-                    return redirect('competition:submit', pk=pk)
-                else:
-                    form = SubmitForm()
-                    return render(request, template, {'error':True, 'form': form, 'event': event})
+            except Problem.DoesNotExist:
+                messages.add_message(request, messages.ERROR, 'Kód neobsahuje platnú úlohu')
 
             else:
-                form = SubmitForm()
-                return render(request, template, {'error':True, 'form': form, 'event': event})
-        else:
-            return render(request, template, {'error':True, 'form': form, 'event': event})
+                try:
+                    Solution.objects.get(event=event, team=team, problem=problem)
+
+                except Solution.DoesNotExist:
+                    Solution.objects.create(event=event, team=team, problem=problem)
+                    messages.add_message(request, messages.SUCCESS, 'Úloha bola úspešne odovzdaná')
+                    form = SubmitForm()
+
+                else:
+                    messages.add_message(request, messages.ERROR, 'Táto úloha už bola odovzdaná')
 
     else:
         form = SubmitForm()
-        try:
-            success = request.session['success']
-            del request.session['success']
-        except:
-            return render(request, template, {'form': form, 'event': event})
-        else:
-            return render(request, template, {'success':success, 'form': form, 'event': event})
+
+    return render(request, template_name, {'form': form, 'event': event})
