@@ -11,7 +11,7 @@
 {% block content %}
   {% if messages %}
     {% for message in messages %}
-      <div id="{% if message.tags %}{{ message.tags }}{% endif %}" class="message">
+      <div id="{% if message.tags %}{{ message.tags }}{% endif %}" class="{% if message.tags %}{{ message.tags }}{% endif %} message">
         {{ message }}
         <button type="button" onclick="close_this('{% if message.tags %}{{ message.tags }}{% endif %}');" class="close_alert {% if message.tags %}{{ message.tags }}{% endif %}">&#x2716;</button>
       </div>
@@ -20,7 +20,28 @@
 
   <form id="barform" action="{% url 'competition:submit' event.pk %}" method="POST" autocomplete="off">
     {% csrf_token %}
-    {{ form.as_p }}
+    {% if form.non_field_errors %}
+      <div id="non_field_error" class="error message">
+        {% for error in form.non_field_errors %}
+          {{ error|escape }}
+        {% endfor %}
+        <button type="button" onclick="close_this('non_field_error');" class="close_alert error">&#x2716;</button>
+      </div>
+    {% endif %}
+    <div>
+      {% if form.code.errors %}
+        <div id="field_error" class="error message">
+          {% for error in form.code.errors %}
+            {{ error|escape }} Skús kód naskenovať ešte raz a ak znova uvidíš tento problém, zapíš si čas
+            odovzdania a kontaktuj hlavného IT organizátora.
+          {% endfor %}
+          <button type="button" onclick="close_this('field_error');" class="close_alert error">&#x2716;</button>
+        </div>
+      {% endif %}
+      <p>
+        {{ form.code }}
+      </p>
+    </div>
   </form>
 {% endblock %}
 
