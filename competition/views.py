@@ -1,7 +1,7 @@
 from functools import reduce
 
 from django.contrib import messages
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import DetailView, ListView
 
 from participant.models import Team
@@ -21,7 +21,7 @@ class EventDetailView(DetailView):
     context_object_name = 'event'
 
 def submit(request, pk):
-    event = Event.objects.get(pk=pk)
+    event = get_object_or_404(Event, pk=pk)
     template_name = 'competition/submit.html'
 
     if request.method == 'POST':
@@ -29,16 +29,13 @@ def submit(request, pk):
 
         if form.is_valid():
             code = form.cleaned_data['code']
-            code_string = ''
-            for digit in code:
-                code_string += str(digit)
 
             convert = lambda l: reduce(lambda p, n: p*10 + n, l)
-            number, position = convert(code[:3]), convert(code[3:])
+            number, position, code_string = convert(code[:3]), convert(code[3:]), str(convert(code))
 
             try:
                 team = Team.objects.get(number=number)
-                problem = Problem.objects.get( event=event, position=position)
+                problem = Problem.objects.get(event=event, position=position)
 
             except Team.DoesNotExist:
                 messages.add_message(request, messages.ERROR, 'Kód neobsahuje platný tím! Prečítané číslo tímu je {} a tento tím nie je do súťaže registrovaný. #{}'.format(number, code_string))
