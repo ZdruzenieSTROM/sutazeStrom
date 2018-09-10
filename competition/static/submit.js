@@ -13,3 +13,9 @@ focuser();
 input.onblur = function () {
     setTimeout(focuser, 0);
 };
+
+function init(obj) {
+  obj.value = "";
+}
+
+window.onload = init(input);
