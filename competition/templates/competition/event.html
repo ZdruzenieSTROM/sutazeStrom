@@ -7,7 +7,7 @@
 
   <ul>
     <li><a href="{% url 'competition:submit' event.pk %}">Odovzdávač</a></li>
-    <li><a href="">Výsledky</a></li>
+    <li><a href="{% url 'competition:results' event.pk %}">Výsledky</a></li>
     <li><a href="">Tímy</a></li>
   </ul>
 {% endblock %}

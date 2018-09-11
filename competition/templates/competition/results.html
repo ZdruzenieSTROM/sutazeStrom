@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event }} &ndash; Výsledky{% endblock %}
+
+{% block content %}
+<table>
+    <thead>
+        <tr>
+            <td>Poradie</td>
+            <td>Názov tímu</td>
+            <td>Škola</td>
+            <td>Účastníci</td>
+            <td>Body</td>
+            <td>Najťažšia vyriešená úloha</td>
+            <td>Čas odovzdania najťažšej vyriešenej úlohy</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for team in results %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ team.team_name }}</td>
+            <td>{{ team.school_name }} {{ team.school_address }}, {{ team.school_city }}</td>
+            <td>{{ team.team_members }}</td>
+            <td>{{ team.points }}</td>
+            <td>{{ team.hardest_position }}</td>
+            <td>{{ team.hardest_time }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
