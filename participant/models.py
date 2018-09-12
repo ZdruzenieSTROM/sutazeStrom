@@ -22,7 +22,7 @@ class Participant(models.Model):
     school_class = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(9)])
 
     def __str__(self):
-        return '{} {}, {}'.format(self.first_name, self.last_name, self.team.school.name)
+        return '{} {}, {}'.format(self.first_name, self.last_name, self.team.school)
 
 class School(models.Model):
     name = models.CharField(max_length=200)
