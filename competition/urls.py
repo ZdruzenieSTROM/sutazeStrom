@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import EventListView, EventDetailView, submit, results
+from .views import EventDetailView, EventListView, results, submit
 
 app_name = 'competition'
 

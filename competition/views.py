@@ -10,7 +10,6 @@ from .forms import SubmitForm
 from .models import Event, Problem, Solution
 from .queries import results_query
 
-
 class EventListView(ListView):
     model = Event
     template_name = 'competition/index.html'
