@@ -2,17 +2,29 @@
 
 {% block title %}{{ event }} &ndash; Výsledky{% endblock %}
 
+{% block css %}
+  <style>
+    table {
+      margin: 15px;
+    }
+
+    th, td {
+      padding: 10px;
+    }
+  </style>
+{% endblock %}
+
 {% block content %}
 <table>
     <thead>
         <tr>
-            <td>Poradie</td>
-            <td>Názov tímu</td>
-            <td>Škola</td>
-            <td>Účastníci</td>
-            <td>Body</td>
-            <td>Najťažšia vyriešená úloha</td>
-            <td>Čas odovzdania najťažšej vyriešenej úlohy</td>
+            <th>Poradie</th>
+            <th>Názov tímu</th>
+            <th>Škola</th>
+            <th>Účastníci</th>
+            <th>Body</th>
+            <th>Najťažšia vyriešená úloha</th>
+            <th>Čas odovzdania najťažšej úlohy</th>
         </tr>
     </thead>
     <tbody>
