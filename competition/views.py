@@ -3,6 +3,7 @@ from functools import reduce
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import DetailView, ListView
+from django.contrib.admin.views.decorators import staff_member_required
 
 from participant.models import Team
 
@@ -20,6 +21,7 @@ class EventDetailView(DetailView):
     template_name = 'competition/event.html'
     context_object_name = 'event'
 
+@staff_member_required
 def submit(request, pk):
     event = get_object_or_404(Event, pk=pk)
     template_name = 'competition/submit.html'
@@ -62,6 +64,7 @@ def submit(request, pk):
 
     return render(request, template_name, {'form': form, 'event': event})
 
+@staff_member_required
 def results(request, pk):
     event = get_object_or_404(Event, pk=pk)
     template_name = 'competition/results.html'
