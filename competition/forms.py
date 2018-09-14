@@ -34,41 +34,38 @@ class SubmitForm(forms.Form):
         return reduce(lambda p, n: p*10 + n, code)
 
     def clean(self):
-        if self.errors:
-            return
-
         cleaned_data = super(SubmitForm, self).clean()
-        code = cleaned_data['code']
-        event = cleaned_data['event']
 
-        number, position = code // 100, code % 100
+        if not self.errors:
+            code = cleaned_data['code']
+            event = cleaned_data['event']
 
-        try:
-            team = Team.objects.get(event=event, number=number)
-            problem = Problem.objects.get(event=event, position=position)
-
-        except Team.DoesNotExist:
-            raise forms.ValidationError('Číslo tímu {} nezodpovedá registrovanému tímu!'.format(number), code='team_does_not_exist')
-
-        except Problem.DoesNotExist:
-            raise forms.ValidationError('Úloha číslo {} v tejto súťaži neexistuje!'.format(position), code='problem_does_not_exist')
-
-        else:
-            self.cleaned_data['team'] = team
-            self.cleaned_data['problem'] = problem
+            number, position = code // 100, code % 100
 
             try:
-                solution = Solution.objects.get(event=event, team=team, problem=problem)
+                team = Team.objects.get(event=event, number=number)
+                problem = Problem.objects.get(event=event, position=position)
 
-            except:
-                pass
+            except Team.DoesNotExist:
+                raise forms.ValidationError('Číslo tímu {} nezodpovedá registrovanému tímu!'.format(number), code='team_does_not_exist')
+
+            except Problem.DoesNotExist:
+                raise forms.ValidationError('Úloha číslo {} v tejto súťaži neexistuje!'.format(position), code='problem_does_not_exist')
 
             else:
-                raise forms.ValidationError('Táto úloha už bola odovzdaná v čase {}!. ({})'.format(solution.time, code))
+                self.cleaned_data['team'] = team
+                self.cleaned_data['problem'] = problem
+
+                try:
+                    solution = Solution.objects.get(event=event, team=team, problem=problem)
+
+                except:
+                    pass
+
+                else:
+                    raise forms.ValidationError('Táto úloha už bola odovzdaná v čase {}! ({})'.format(solution.time.strftime('%H:%M:%S (%d. %m. %Y)'), code))
 
         return cleaned_data
 
     def save(self):
-        cleaned_data = self.clean()
-
-        return Solution.objects.create(event=cleaned_data['event'], team=cleaned_data['team'], problem=cleaned_data['problem'])
+        return Solution.objects.create(event=self.cleaned_data['event'], team=self.cleaned_data['team'], problem=self.cleaned_data['problem'])

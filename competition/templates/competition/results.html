@@ -36,7 +36,7 @@
             <td>{{ team.team_members }}</td>
             <td>{{ team.points }}</td>
             <td>{{ team.hardest_position }}</td>
-            <td>{{ team.hardest_time }}</td>
+            <td>{{ team.hardest_time|date:"H:i:s (d. m. Y)" }}</td>
         </tr>
         {% endfor %}
     </tbody>
