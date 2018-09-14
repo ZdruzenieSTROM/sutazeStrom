@@ -1,9 +1,8 @@
 from functools import reduce
 
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
-from django.shortcuts import get_object_or_404, redirect, render, reverse
-from django.views.generic import DetailView, FormView, ListView, TemplateView
+from django.shortcuts import reverse
+from django.views.generic import DetailView, FormView, ListView
 from django.views.generic.detail import SingleObjectMixin
 
 from participant.models import Team
@@ -41,7 +40,7 @@ class SubmitFormView(FormView, SingleObjectMixin):
         return reverse('competition:submit', kwargs={'pk': self.kwargs['pk']})
 
     def form_valid(self, form):
-        event = get_object_or_404(Event, pk=int(self.kwargs['pk']))
+        event = self.object
         code = form.cleaned_data['code']
 
         convert = lambda l: reduce(lambda p, n: p*10 + n, l)
@@ -77,7 +76,7 @@ class ResultsView(DetailView):
     template_name = 'competition/results.html'
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super(ResultsView, self).get_context_data(**kwargs)
         context['results'] = Solution.objects.raw(results_query, [self.kwargs['pk']])
 
         return context
