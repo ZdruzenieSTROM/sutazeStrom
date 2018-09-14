@@ -21,7 +21,7 @@ class SubmitForm(forms.Form):
             code = [int(c) for c in self.cleaned_data['code']]
 
         except ValueError:
-            raise forms.forms.ValidationError('Nesprávny formát!', code='invalid_format')
+            raise forms.ValidationError('Nesprávny formát!', code='invalid_format')
 
         if len(code) != 6:
             raise forms.ValidationError('Nesprávna dĺžka kódu!', code='invalid_length')
