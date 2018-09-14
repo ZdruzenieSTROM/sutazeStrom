@@ -1,6 +1,7 @@
 from django.core.validators import MinValueValidator
 from django.db import models
 
+
 class Problem(models.Model):
     position = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
     points = models.IntegerField()

@@ -1,4 +1,4 @@
-results_query = '''
+RESULTS_QUERY = '''
 SELECT
     participant_team.id AS id,
     participant_team.name AS team_name,

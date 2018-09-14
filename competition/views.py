@@ -1,15 +1,12 @@
-from functools import reduce
-
 from django.contrib import messages
 from django.shortcuts import reverse
 from django.views.generic import DetailView, FormView, ListView
 from django.views.generic.detail import SingleObjectMixin
 
-from participant.models import Team
-
 from .forms import SubmitForm
-from .models import Event, Problem, Solution
-from .queries import results_query
+from .models import Event, Solution
+from .queries import RESULTS_QUERY
+
 
 class EventListView(ListView):
     model = Event
@@ -34,41 +31,23 @@ class SubmitFormView(FormView, SingleObjectMixin):
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        return super(SubmitFormView, self).post(request, *args, **kwargs)
+        return super(SubmitFormView, self).dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
         return reverse('competition:submit', kwargs={'pk': self.kwargs['pk']})
 
+    def get_initial(self):
+        return {'event': self.object}
+
     def form_valid(self, form):
-        event = self.object
-        code = form.cleaned_data['code']
+        solution = form.save()
 
-        convert = lambda l: reduce(lambda p, n: p*10 + n, l)
-        number, position, code_string = convert(code[:3]), convert(code[3:]), str(convert(code))
-
-        try:
-            team = Team.objects.get(number=number)
-            problem = Problem.objects.get(event=event, position=position)
-
-        except Team.DoesNotExist:
-            messages.add_message(self.request, messages.ERROR, 'Kód neobsahuje platný tím! Prečítané číslo tímu je {} a tento tím nie je do súťaže registrovaný. #{}'.format(number, code_string))
-
-        except Problem.DoesNotExist:
-            messages.add_message(self.request, messages.ERROR, 'Kód neobsahuje platnú úlohu! Prečítané číslo úlohy je {} a táto úloha v súťaži nie je evidovaná. #{}'.format(position, code_string))
-
-        else:
-            try:
-                solution = Solution.objects.get(event=event, team=team, problem=problem)
-
-            except Solution.DoesNotExist:
-                solution = Solution.objects.create(event=event, team=team, problem=problem)
-                messages.add_message(self.request, messages.SUCCESS, 'OK! Úloha {} bola úspešne odovzdaná tímom {} zo školy {}.'.format(solution.problem.position, solution.team.name, solution.team.school))
-
-            else:
-                messages.add_message(self.request, messages.ERROR, 'Táto úloha už bola odovzdaná! Stalo sa tak v čase {}. #{}'.format(solution.time, code_string))
+        messages.add_message(self.request, messages.SUCCESS,\
+                             'Úloha {} bola úspešne odovzdaná tímom {} zo školy {}.'.format(\
+                             solution.problem.position, solution.team.name, solution.team.school))
 
         return super(SubmitFormView, self).form_valid(form)
-    
+
 class ResultsView(DetailView):
     model = Event
     context_object_name = 'event'
@@ -77,6 +56,6 @@ class ResultsView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ResultsView, self).get_context_data(**kwargs)
-        context['results'] = Solution.objects.raw(results_query, [self.kwargs['pk']])
+        context['results'] = Solution.objects.raw(RESULTS_QUERY, [self.kwargs['pk']])
 
         return context
