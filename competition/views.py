@@ -24,13 +24,18 @@ class EventDetailView(DetailView):
 
     template_name = 'competition/event.html'
 
-class SubmitFormView(FormView, DetailView):
+class SubmitFormView(FormView, SingleObjectMixin):
     model = Event
     context_object_name = 'event'
 
     template_name = 'competition/submit.html'
 
     form_class = SubmitForm
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        return super(SubmitFormView, self).post(request, *args, **kwargs)
 
     def get_success_url(self):
         return reverse('competition:submit', kwargs={'pk': self.kwargs['pk']})
@@ -58,13 +63,13 @@ class SubmitFormView(FormView, DetailView):
 
             except Solution.DoesNotExist:
                 solution = Solution.objects.create(event=event, team=team, problem=problem)
-                messages.add_message(self.request, messages.SUCCESS, 'OK! Úloha {} bola úspešne odovzdaná tímom zo školy {}.'.format(solution.problem.position, solution.team.school.name))
+                messages.add_message(self.request, messages.SUCCESS, 'OK! Úloha {} bola úspešne odovzdaná tímom {} zo školy {}.'.format(solution.problem.position, solution.team.name, solution.team.school))
 
             else:
                 messages.add_message(self.request, messages.ERROR, 'Táto úloha už bola odovzdaná! Stalo sa tak v čase {}. #{}'.format(solution.time, code_string))
 
-        return super().form_valid(form)
-
+        return super(SubmitFormView, self).form_valid(form)
+    
 class ResultsView(DetailView):
     model = Event
     context_object_name = 'event'
