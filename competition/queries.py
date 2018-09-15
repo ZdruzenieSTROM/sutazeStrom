@@ -5,8 +5,9 @@ SELECT
     participant_school.name AS school_name,
     participant_school.address AS school_address,
     participant_school.city AS school_city,
-    members.names AS team_members,	
-    SUM(competition_problem.points) AS points,
+    members.names AS team_members,
+    members.compensation AS compensation,
+    SUM(competition_problem.points) + compensation AS points,
     hardest.position AS hardest_position,
     hardest.time AS hardest_time
 FROM participant_team
@@ -15,19 +16,21 @@ LEFT OUTER JOIN competition_solution ON participant_team.id = competition_soluti
 LEFT OUTER JOIN competition_problem ON competition_solution.problem_id = competition_problem.id
 LEFT OUTER JOIN (
     SELECT
-        GROUP_CONCAT(full_names.full_name, ", ") AS names,
-        full_names.team_id
+        GROUP_CONCAT(members.full_name, ", ") AS names,
+        SUM(members.compensation) AS compensation,
+        members.team_id
     FROM (
         SELECT
             participant_participant.first_name || " " || participant_participant.last_name AS full_name,
+            IFNULL(competition_compensation.points, 0) AS compensation,
             participant_participant.team_id
-        FROM
-            participant_participant
+        FROM participant_participant
+        LEFT OUTER JOIN	competition_compensation ON participant_participant.school_class = competition_compensation.school_class
         ORDER BY
             last_name ASC,
             first_name ASC
-    ) AS full_names
-    GROUP BY full_names.team_id
+    ) AS members
+    GROUP BY members.team_id
 ) AS members ON participant_team.id = members.team_id
 LEFT OUTER JOIN (
     SELECT

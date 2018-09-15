@@ -57,9 +57,9 @@ class SubmitForm(forms.Form):
                 self.cleaned_data['problem'] = problem
 
                 try:
-                    solution = Solution.objects.get(event=event, team=team, problem=problem)
+                    solution = Solution.objects.get(team=team, problem=problem)
 
-                except:
+                except Solution.DoesNotExist:
                     pass
 
                 else:
@@ -68,4 +68,4 @@ class SubmitForm(forms.Form):
         return cleaned_data
 
     def save(self):
-        return Solution.objects.create(event=self.cleaned_data['event'], team=self.cleaned_data['team'], problem=self.cleaned_data['problem'])
+        return Solution.objects.create(team=self.cleaned_data['team'], problem=self.cleaned_data['problem'])
