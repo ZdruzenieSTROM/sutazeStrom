@@ -2,16 +2,13 @@ RESULTS_QUERY = '''
 SELECT
     participant_team.id AS id,
     participant_team.name AS team_name,
-    participant_school.name AS school_name,
-    participant_school.address AS school_address,
-    participant_school.city AS school_city,
+    participant_team.school AS school,
     members.names AS team_members,
     members.compensation AS compensation,
     SUM(competition_problem.points) + compensation AS points,
     hardest.position AS hardest_position,
     hardest.time AS hardest_time
 FROM participant_team
-JOIN participant_school ON participant_team.school_id = participant_school.id
 LEFT OUTER JOIN competition_solution ON participant_team.id = competition_solution.team_id
 LEFT OUTER JOIN competition_problem ON competition_solution.problem_id = competition_problem.id
 LEFT OUTER JOIN (
@@ -22,7 +19,7 @@ LEFT OUTER JOIN (
     FROM (
         SELECT
             participant_participant.first_name || " " || participant_participant.last_name AS full_name,
-            IFNULL(competition_compensation.points, 0) AS compensation,
+            competition_compensation.points AS compensation,
             participant_participant.team_id
         FROM participant_participant
         LEFT OUTER JOIN	competition_compensation ON participant_participant.school_class = competition_compensation.school_class

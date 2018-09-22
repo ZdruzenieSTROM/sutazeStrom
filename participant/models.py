@@ -5,7 +5,7 @@ class Team(models.Model):
     name = models.CharField(max_length=200)
     number = models.PositiveSmallIntegerField(unique=True, validators=[MinValueValidator(100), MaxValueValidator(999)])
 
-    school = models.ForeignKey('School', on_delete=models.CASCADE)
+    school = models.CharField(max_length=300)
 
     event = models.ForeignKey('competition.Event', on_delete=models.CASCADE)
 
@@ -22,12 +22,3 @@ class Participant(models.Model):
 
     def __str__(self):
         return '{} {}, {}'.format(self.first_name, self.last_name, self.team.school)
-
-class School(models.Model):
-    name = models.CharField(max_length=200)
-    address = models.CharField(max_length=200, help_text='Ulica s číslom')
-    city = models.CharField(max_length=200)
-    postal_code = models.CharField(max_length=6)
-
-    def __str__(self):
-        return '{} {}, {} {}'.format(self.name, self.address, self.postal_code, self.city)
