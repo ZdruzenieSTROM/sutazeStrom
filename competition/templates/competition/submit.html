@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
-{% load staticfiles %}
+{% load static %}
 
 {% block title %}{{ event }} &ndash; Odovzdaj{% endblock %}
 
 {% block css %}
-  <link rel="stylesheet" href="{% static 'submit.css' %}">
+<link rel="stylesheet" href="{% static 'competition/submit.css' %}" />
 {% endblock %}
 
 {% block content %}
@@ -46,6 +46,6 @@
   </form>
 {% endblock %}
 
-{% block lateJS %}
-  <script type="text/javascript" src="{% static 'submit.js' %}"></script>
+{% block javascript %}
+<script type="text/javascript" src="{% static 'competition/submit.js' %}"></script>
 {% endblock %}

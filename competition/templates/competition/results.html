@@ -1,17 +1,11 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block title %}{{ event }} &ndash; Výsledky{% endblock %}
 
 {% block css %}
-  <style>
-    table {
-      margin: 15px;
-    }
-
-    th, td {
-      padding: 10px;
-    }
-  </style>
+<link rel="stylesheet" href="{% static 'competition/results.css' %}" />
 {% endblock %}
 
 {% block content %}

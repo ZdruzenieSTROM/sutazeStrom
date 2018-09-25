@@ -111,6 +111,10 @@ USE_TZ = True
 
 LOGIN_URL = 'admin:login'
 
-STATIC_ROOT = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]

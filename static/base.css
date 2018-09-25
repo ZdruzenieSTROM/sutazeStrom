@@ -1,0 +1,39 @@
+body {
+    margin: 0;
+    font-family: 'Barlow Semi Condensed', sans-serif;
+}
+
+h1 {
+    text-align: center;
+}
+
+.topnav {
+    overflow: hidden;
+    background-color: #2f2f2f;
+}
+
+.topnav a {
+    display: block;
+    box-sizing: border-box;
+    color: white;
+    padding: 14px 26px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 17px;
+    width: 50%;
+    min-width: 16px;
+}
+
+.topnav-link-left {
+    float: left;
+    text-align: left;
+}
+
+.topnav-link-right {
+    float: right;
+    text-align: right;
+}
+
+.topnav a:hover {
+    text-decoration: underline;
+}

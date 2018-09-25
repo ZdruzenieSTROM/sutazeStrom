@@ -3,10 +3,10 @@
 {% block title %}{{ event }}{% endblock %}
 
 {% block content %}
-  <h1>{{ event }}</h1>
+<h1>{{ event }}</h1>
 
-  <ul>
-    <li><a href="{% url 'competition:submit' event.pk %}">Odovzdávač</a></li>
-    <li><a href="{% url 'competition:results' event.pk %}">Výsledky</a></li>
-  </ul>
+<ul>
+  <li><a href="{% url 'competition:submit' event.pk %}">Odovzdávač</a></li>
+  <li><a href="{% url 'competition:results' event.pk %}">Výsledky</a></li>
+</ul>
 {% endblock %}
