@@ -20,12 +20,19 @@
 {% endif %}
 <form action="{% url 'participant:import_data' %}" method="POST" enctype="multipart/form-data" style="width: 450px; margin: auto;">
     {% csrf_token %}
-    <input type="file" id="csv_file" name="csv_file" required>
-    <br>
-    <button> Upload </button>
+    {% if form.file.errors %}
+    <div id="field_error" class="error message">
+      {% for error in form.file.errors %}
+        {{ error|escape }}
+      {% endfor %}
+      <button type="button" onclick="close_this('field_error');" class="close_alert error">&#x2716;</button>
+    </div>
+    {% endif %}
+    <p>{{ form.csv }}</p>
+    <input type="submit" value="Nahraj" />
 </form>
 {% endblock %}
 
-{% block lateJS %}
-  <script type="text/javascript" src="{% static 'submit.js' %}"></script>
+{% block javascript %}
+<script type="text/javascript" src="{% static 'competition/submit.js' %}"></script>
 {% endblock %}
