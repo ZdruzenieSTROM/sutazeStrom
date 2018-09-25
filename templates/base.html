@@ -12,8 +12,9 @@
   </head>
   <body>
     <div class="topnav" id="topnavbar">
-      <a class="topnav-link topnav-link-left" href="{% url 'admin:index' %}">Admin</a>
-      {% if event %}<a class="topnav-link topnav-link-right" href="{% url 'competition:event' event.pk %}">{{ event }}</a>{% endif %}
+      <a class="navbar" href="{% url 'admin:index' %}">Admin</a>
+      <a class="navbar" href="{% url 'participant:import_data' %}">Import</a>
+      <a class="navbar" href="{% url 'participant:export_data' %}">Export</a>
     </div>
     <div>
       {% block content %}
