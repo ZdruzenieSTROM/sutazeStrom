@@ -25,7 +25,7 @@
         text-decoration: none;
         font-weight: bold;
         font-size: 17px;
-        width: 100%;
+        width: 60px;
         min-width: 16px;
         text-align: left;
       }
@@ -39,6 +39,8 @@
   <body>
     <div class="topnav" id="topnavbar">
       <a class="navbar" href="{% url 'admin:index' %}">Admin</a>
+      <a class="navbar" href="{% url 'participant:import_data' %}">Import</a>
+      <a class="navbar" href="{% url 'participant:export_data' %}">Export</a>
     </div>
     <div>
       {% block content %}
