@@ -24,16 +24,6 @@ h1 {
     min-width: 16px;
 }
 
-.topnav-link-left {
-    float: left;
-    text-align: left;
-}
-
-.topnav-link-right {
-    float: right;
-    text-align: right;
-}
-
 .topnav a:hover {
     text-decoration: underline;
 }
