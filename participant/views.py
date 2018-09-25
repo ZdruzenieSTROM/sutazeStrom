@@ -4,6 +4,7 @@ import pandas
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
+from django.conf import settings
 
 from django.views import View
 from .models import Team
@@ -71,7 +72,14 @@ class ImportData(View):
             'cislo_timu',
         ]
         # tim, skola, pocet_clenov, ucastnik_meno, ucastnik_priezvisko, ucastnik_rocnik
-        data = pandas.read_csv(csv_file, sep=';', encoding='iso8859_2', names=colnames)
+        data = pandas.read_csv(
+            csv_file,
+            sep=settings.CSV_DATA_SEPARATOR,
+            encoding=settings.CSV_DATA_ENCODING,
+            names=colnames
+        )
+
+        print(data.skola.tolist())
 
         # some action...
 
