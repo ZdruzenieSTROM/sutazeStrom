@@ -13,17 +13,72 @@ h1 {
 }
 
 .topnav a {
-    display: block;
+    display: inline-block;
     box-sizing: border-box;
     color: white;
     padding: 14px 26px;
     text-decoration: none;
     font-weight: bold;
     font-size: 17px;
-    width: 50%;
     min-width: 16px;
+}
+
+.topnav a.navbar-right {
+    float: right;
 }
 
 .topnav a:hover {
     text-decoration: underline;
+}
+
+div.message {
+    margin: 20px;
+    padding: 10px 49px 10px 20px;
+    width: calc(100%-70px);
+    border: 0.5px solid;
+    border-radius: 8px;
+    position: relative;
+    font-size: 17px;
+    text-align: left;
+    font-weight: 600;
+}
+
+button.close_alert {
+    background-color: Transparent;
+    background-repeat: no-repeat;
+    border: none;
+    cursor:pointer;
+    overflow: hidden;
+    outline:none;
+    opacity: 0.3;
+    float: right;
+    position: absolute;
+    top: 4px;
+    right: 15px;
+    font-size: 1.2em;
+    font-weight: 550;
+}
+
+button.close_alert:hover {
+    opacity: 1;
+}
+
+div.error {
+    background-color: #ffcccc;
+    border-color: #ff3333;
+    color: #990000;
+}
+
+button.error {
+    color: #990000;
+}
+
+div.success {
+    background-color: #99ff99;
+    border-color: #00cc00;
+    color: #008000;
+}
+
+button.success {
+    color: #008000;
 }

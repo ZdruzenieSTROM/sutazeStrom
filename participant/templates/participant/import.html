@@ -5,31 +5,24 @@
 {% block title %}Import dát{% endblock %}
 
 {% block css %}
-  <link rel="stylesheet" href="{% static 'submit.css' %}">
+<link rel="stylesheet" href="{% static 'submit.css' %}">
 {% endblock %}
 
 {% block content %}
 <h1>Import CSV súboru</h1>
-{% if messages %}
-    {% for message in messages %}
-      <div id="{% if message.tags %}{{ message.tags }}{% endif %}" class="{% if message.tags %}{{ message.tags }}{% endif %} message">
-        {{ message }}
-        <button type="button" onclick="close_this('{% if message.tags %}{{ message.tags }}{% endif %}');" class="close_alert {% if message.tags %}{{ message.tags }}{% endif %}">&#x2716;</button>
-      </div>
-    {% endfor %}
-{% endif %}
+
 <form action="{% url 'participant:import_data' %}" method="POST" enctype="multipart/form-data" style="width: 450px; margin: auto;">
-    {% csrf_token %}
-    {% if form.file.errors %}
-    <div id="field_error" class="error message">
-      {% for error in form.file.errors %}
-        {{ error|escape }}
-      {% endfor %}
-      <button type="button" onclick="close_this('field_error');" class="close_alert error">&#x2716;</button>
-    </div>
-    {% endif %}
-    <p>{{ form.csv }}</p>
-    <input type="submit" value="Nahraj" />
+  {% csrf_token %}
+  {% if form.file.errors %}
+  <div id="field_error" class="error message">
+    {% for error in form.file.errors %}
+      {{ error|escape }}
+    {% endfor %}
+    <button type="button" onclick="close_this('field_error');" class="close_alert error">&#x2716;</button>
+  </div>
+  {% endif %}
+  <p>{{ form.csv }}</p>
+  <input type="submit" value="Nahraj" />
 </form>
 {% endblock %}
 
