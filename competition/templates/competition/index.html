@@ -9,7 +9,12 @@
   {% for event in events %}
   <li><a href="{% url 'competition:event' event.pk %}">{{ event }}</a></li>
   {% endfor %}
+</ul>
+
+<h1>Účastníci</h1>
+<ul>
   <li><a href="{% url 'participant:import' %}">Import</a></li>
   <li><a href="{% url 'participant:export' %}">Export</a></li>
 </ul>
+
 {% endblock %}
