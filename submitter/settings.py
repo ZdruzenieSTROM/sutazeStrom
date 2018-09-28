@@ -124,3 +124,15 @@ STATICFILES_DIRS = [
 CSV_DELIMITER = ';'
 
 CSV_ENCODING = 'utf8'
+
+# Messages
+
+from django.contrib import messages
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'debug',
+    messages.INFO: 'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR: 'danger',
+}

@@ -14,7 +14,7 @@ class SubmitForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(SubmitForm, self).__init__(*args, **kwargs)
-        self.fields['code'].widget.attrs.update({'id': 'barcode_input'})
+        self.fields['code'].widget.attrs.update({'class': 'form-control'})
 
     def clean_code(self):
         try:
