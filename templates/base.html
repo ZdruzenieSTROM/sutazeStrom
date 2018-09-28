@@ -13,14 +13,25 @@
   <body>
     <div class="topnav" id="topnavbar">
       <a class="navbar" href="{% url 'admin:index' %}">Admin</a>
-      <a class="navbar" href="{% url 'participant:import_data' %}">Import</a>
-      <a class="navbar" href="{% url 'participant:export_data' %}">Export</a>
+      <a class="navbar" href="{% url 'competition:index' %}">Hlavná stránka</a>
+      {% if event %}<a class="navbar navbar-right" href="{% url 'competition:event' event.pk %}">{{ event }}</a>{% endif %}
     </div>
+
+    {% if messages %}
+    {% for message in messages %}
+      <div id="{% if message.tags %}{{ message.tags }}{% endif %}" class="{% if message.tags %}{{ message.tags }}{% endif %} message">
+        {{ message }}
+        <button type="button" onclick="close_this('{% if message.tags %}{{ message.tags }}{% endif %}');" class="close_alert {% if message.tags %}{{ message.tags }}{% endif %}">&#x2716;</button>
+      </div>
+    {% endfor %}
+    {% endif %}
+
     <div>
       {% block content %}
       {% endblock %}
     </div>
     {% block javascript %}
     {% endblock %}
+    <script src="{% static 'base.js' %}"></script>
   </body>
 </html>

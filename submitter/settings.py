@@ -119,6 +119,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-CSV_DATA_SEPARATOR = ';'
+# CSV files
 
-CSV_DATA_ENCODING = 'latin_1'
+CSV_DELIMITER = ';'
