@@ -51,7 +51,7 @@ class ImportForm(forms.Form):
         csv_file = self.cleaned_data['csv_file']
 
         if csv_file and not csv_file.name.endswith('.csv'):
-            raise forms.ValidationError('Nesprávna prípona súboru')
+            raise forms.ValidationError('Nesprávna prípona súboru, akceptovaná je len CSV!')
 
         return csv_file
 
@@ -61,16 +61,29 @@ class ImportForm(forms.Form):
         csv_file, csv_text = cleaned_data['csv_file'], cleaned_data['csv_text']
 
         if not (csv_file or csv_text):
-            raise forms.ValidationError('Súbor ani textový vstup neobsahujú žiadne dáta')
+            raise forms.ValidationError('Súbor ani textový vstup neobsahujú žiadne dáta!')
 
         if csv_file and csv_text:
-            raise forms.ValidationError('Vyber si len jeden zdroj údajov')
+            raise forms.ValidationError('Vyber si len jeden zdroj údajov!')
 
         if csv_file:
-            self.cleaned_data['dataframe'] = read_csv(csv_file, names=CSV_FIELDS, delimiter=settings.CSV_DELIMITER, encoding=settings.CSV_ENCODING)
+            self.cleaned_data['dataframe'] = read_csv(
+                csv_file,
+                names=CSV_FIELDS,
+                delimiter=settings.CSV_DELIMITER,
+                encoding=settings.CSV_ENCODING,
+            )
         else:
-            self.cleaned_data['dataframe'] = read_csv(StringIO(csv_text), names=CSV_FIELDS, delimiter=settings.CSV_DELIMITER)
+            self.cleaned_data['dataframe'] = read_csv(
+                StringIO(csv_text),
+                names=CSV_FIELDS,
+                delimiter=settings.CSV_DELIMITER,
+            )
 
-        # zavolaj funkciu na kontrolu spravnosti importu
+        # kontrola spravnosti dat
 
         return cleaned_data
+
+    def save(self):
+        # ulozenie dat
+        pass

@@ -1,6 +1,3 @@
-from functools import reduce
-
-from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import reverse
@@ -19,11 +16,25 @@ class ImportFormView(FormView):
         return reverse('participant:import')
 
     def form_valid(self, form):
-        # uloz importovane data, idealne zavolanim funkcie, ktoru si vytvoris v triede formulara
+        try:
+            form.save()
 
-        # daj nejaky pekny message ze v poriadku
+        except:
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                'Chyba pri ukladaní do databázy!'
+            )
+
+        else:
+            messages.add_message(
+                self.request,
+                messages.SUCCESS,
+                'Súbor bol úspešne importovaný'
+            )
 
         return super(ImportFormView, self).form_valid(form)
+
 
 class ExportView(View):
     def get(self, request):
