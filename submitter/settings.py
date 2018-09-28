@@ -122,3 +122,5 @@ STATICFILES_DIRS = [
 # CSV files
 
 CSV_DELIMITER = ';'
+
+CSV_ENCODING = 'utf8'

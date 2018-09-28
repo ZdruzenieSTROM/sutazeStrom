@@ -9,7 +9,7 @@
   {% for event in events %}
   <li><a href="{% url 'competition:event' event.pk %}">{{ event }}</a></li>
   {% endfor %}
-  <li><a href="{% url 'participant:import_data' %}">Import</a></li>
-  <li><a href="{% url 'participant:export_data' %}">Export</a></li>
+  <li><a href="{% url 'participant:import' %}">Import</a></li>
+  <li><a href="{% url 'participant:export' %}">Export</a></li>
 </ul>
 {% endblock %}
