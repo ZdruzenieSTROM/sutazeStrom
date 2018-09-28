@@ -1,38 +1,36 @@
 {% extends 'base.html' %}
 
-{% load static %}
-
 {% block title %}{{ event }} &ndash; Odovzdaj{% endblock %}
 
-{% block css %}
-<link rel="stylesheet" href="{% static 'competition/submit.css' %}" />
-{% endblock %}
-
 {% block content %}
-<form id="barform" action="{% url 'competition:submit' event.pk %}" method="POST" autocomplete="off">
+<form action="{% url 'competition:submit' event.pk %}" method="POST" autocomplete="off">
   {% csrf_token %}
-  {% if form.non_field_errors %}
-    <div id="non_field_error" class="error message">
-      {% for error in form.non_field_errors %}
-        {{ error|escape }}
-      {% endfor %}
-      <button type="button" onclick="close_this('non_field_error');" class="close_alert error">&#x2716;</button>
+
+  {% for error in form.non_field_errors %}
+  <div class="alert alert-dismissible alert-danger">
+    {{ error }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+
+  {% for field in form%}
+    {% for error in field.errors %}
+    <div class="alert alert-dismissible alert-danger" role="alert">
+      {{ error }} Skús kód naskenovať ešte raz a ak znova uvidíš tento problém, zapíš si čas
+      odovzdania a kontaktuj hlavného IT organizátora.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+      </button>
     </div>
-  {% endif %}
-  <div>
-    {% if form.code.errors %}
-      <div id="field_error" class="error message">
-        {% for error in form.code.errors %}
-          {{ error|escape }} Skús kód naskenovať ešte raz a ak znova uvidíš tento problém, zapíš si čas
-          odovzdania a kontaktuj hlavného IT organizátora.
-        {% endfor %}
-        <button type="button" onclick="close_this('field_error');" class="close_alert error">&#x2716;</button>
-      </div>
-    {% endif %}
-    {{ form.event }}
-    <p>
-      {{ form.code }}
-    </p>
+    {% endfor %}
+  {% endfor %}
+
+  {{ form.event }}
+
+  <div class="form-group">
+    {{ form.code }}
   </div>
 </form>
 {% endblock %}

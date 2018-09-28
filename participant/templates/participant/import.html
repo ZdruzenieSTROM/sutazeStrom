@@ -1,34 +1,38 @@
 {% extends 'base.html' %}
 
-{% load staticfiles %}
-
 {% block title %}Import dát{% endblock %}
 
 {% block content %}
 <h1>Import CSV súboru</h1>
 
-<form action="{% url 'participant:import' %}" method="POST" enctype="multipart/form-data" style="width: 450px; margin: auto;">
+<form action="{% url 'participant:import' %}" method="POST" enctype="multipart/form-data">
   {% csrf_token %}
-  {% if form.non_field_errors %}
-    <div id="non_field_error" class="error message">
-      {% for error in form.non_field_errors %}
-        {{ error|escape }}
-      {% endfor %}
-      <button type="button" onclick="close_this('non_field_error');" class="close_alert error">&#x2716;</button>
-    </div>
-  {% endif %}
-  {% for field in form %}
-    {% if field.errors %}
-    <div id="field_error" class="error message">
-      {% for error in field.errors %}
-        {{ error|escape }}
-      {% endfor %}
-      <button type="button" onclick="close_this('field_error');" class="close_alert error">&#x2716;</button>
-    </div>
-    {% endif %}
+  {% for error in form.non_field_errors %}
+  <div class="alert alert-dismissible alert-danger">
+    {{ error }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
   {% endfor %}
-  <p>{{ form.csv_text }}</p>
-  <p>{{ form.csv_file }}</p>
-  <input type="submit" value="Nahraj" />
+
+  {% for field in form%}
+    {% for error in field.errors %}
+    <div class="alert alert-dismissible alert-danger" role="alert">
+      {{ error }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endfor %}
+  {% endfor %}
+
+  <div class="form-group">
+    {% for field in form %}
+    <p>{{ field }}</p>
+    {% endfor %}
+  </div>
+
+  <input type="submit" class="btn btn-primary" value="Nahraj" />
 </form>
 {% endblock %}

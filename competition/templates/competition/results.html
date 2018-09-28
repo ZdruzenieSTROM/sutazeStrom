@@ -9,32 +9,32 @@
 {% endblock %}
 
 {% block content %}
-<table>
-    <thead>
-        <tr>
-            <th>Poradie</th>
-            <th>Názov tímu</th>
-            <th>Škola</th>
-            <th>Účastníci</th>
-            <th>Bonifikácia</th>
-            <th>Body</th>
-            <th>Najťažšia vyriešená úloha</th>
-            <th>Čas odovzdania najťažšej úlohy</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for team in results %}
-        <tr>
-            <td>{{ forloop.counter }}</td>
-            <td>{{ team.team_name }}</td>
-            <td>{{ team.school }}</td>
-            <td>{{ team.team_members }}</td>
-            <td>{{ team.compensation }}</td>
-            <td>{{ team.points }}</td>
-            <td>{{ team.hardest_position }}</td>
-            <td>{{ team.hardest_time|date:"H:i:s (d. m. Y)" }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Poradie</th>
+      <th scope="col">Názov tímu</th>
+      <th scope="col">Škola</th>
+      <th scope="col">Účastníci</th>
+      <th scope="col">Bonifikácia</th>
+      <th scope="col">Body</th>
+      <th scope="col">Najťažšia vyriešená úloha</th>
+      <th scope="col">Čas odovzdania najťažšej úlohy</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for team in results %}
+    <tr>
+      <th scope="row">{{ forloop.counter }}</td>
+      <td>{{ team.team_name }}</td>
+      <td>{{ team.school }}</td>
+      <td>{{ team.team_members }}</td>
+      <td>{{ team.compensation }}</td>
+      <td>{{ team.points }}</td>
+      <td>{{ team.hardest_position }}</td>
+      <td>{{ team.hardest_time|date:"H:i:s (d. m. Y)" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
 {% endblock %}

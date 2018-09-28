@@ -44,8 +44,13 @@ CSV_FIELDS = [
 ]
 
 class ImportForm(forms.Form):
-    csv_text = forms.CharField(widget=forms.Textarea, required=False)
-    csv_file = forms.FileField(required=False)
+    csv_text = forms.CharField(widget=forms.Textarea, required=False, label='')
+    csv_file = forms.FileField(required=False, label='')
+
+    def __init__(self, *args, **kwargs):
+        super(ImportForm, self).__init__(*args, **kwargs)
+        self.fields['csv_text'].widget.attrs.update({'class': 'form-control'})
+        self.fields['csv_file'].widget.attrs.update({'class': 'form-control-file'})
 
     def clean_csv_file(self):
         csv_file = self.cleaned_data['csv_file']
