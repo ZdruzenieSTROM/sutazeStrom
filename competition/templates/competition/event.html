@@ -5,8 +5,8 @@
 {% block content %}
 <h1>{{ event }}</h1>
 
-<ul>
-  <li><a href="{% url 'competition:submit' event.pk %}">Odovzdávač</a></li>
-  <li><a href="{% url 'competition:results' event.pk %}">Výsledky</a></li>
-</ul>
+<p><div class="list-group">
+  <a class="list-group-item list-group-item-action" href="{% url 'competition:submit' event.pk %}">Odovzdávač</a>
+  <a class="list-group-item list-group-item-action" href="{% url 'competition:results' event.pk %}">Výsledky</a>
+</div></p>
 {% endblock %}

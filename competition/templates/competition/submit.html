@@ -33,4 +33,12 @@
     {{ form.code }}
   </div>
 </form>
+
+{% if solutions %}
+<ul class="list-group">
+  {% for solution in solutions %}
+  <li class="list-group-item">{{ solution.team }}, úloha <strong>{{ solution.problem.position }}</strong> <span class="float-right">{{ solution.time|date:"H:i:s (d. m. Y)" }}</span></li>
+  {% endfor %}
+</ul>
+{% endif %}
 {% endblock %}

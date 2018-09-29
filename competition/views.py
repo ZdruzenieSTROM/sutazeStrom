@@ -39,6 +39,13 @@ class SubmitFormView(FormView, SingleObjectMixin):
     def get_initial(self):
         return {'event': self.object}
 
+    def get_context_data(self, **kwargs):
+        context = super(SubmitFormView, self).get_context_data(**kwargs)
+
+        context['solutions'] = Solution.objects.filter(team__event=self.object).order_by('-time')[:10]
+
+        return context
+
     def form_valid(self, form):
         solution = form.save()
 
