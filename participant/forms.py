@@ -63,29 +63,30 @@ class ImportForm(forms.Form):
     def clean(self):
         cleaned_data = super(ImportForm, self).clean()
 
-        csv_file, csv_text = cleaned_data['csv_file'], cleaned_data['csv_text']
+        if not self.errors:
+            csv_file, csv_text = cleaned_data['csv_file'], cleaned_data['csv_text']
 
-        if not (csv_file or csv_text):
-            raise forms.ValidationError('Súbor ani textový vstup neobsahujú žiadne dáta!')
+            if not (csv_file or csv_text):
+                raise forms.ValidationError('Súbor ani textový vstup neobsahujú žiadne dáta!')
 
-        if csv_file and csv_text:
-            raise forms.ValidationError('Vyber si len jeden zdroj údajov!')
+            if csv_file and csv_text:
+                raise forms.ValidationError('Vyber si len jeden zdroj údajov!')
 
-        if csv_file:
-            self.cleaned_data['dataframe'] = read_csv(
-                csv_file,
-                names=CSV_FIELDS,
-                delimiter=settings.CSV_DELIMITER,
-                encoding=settings.CSV_ENCODING,
-            )
-        else:
-            self.cleaned_data['dataframe'] = read_csv(
-                StringIO(csv_text),
-                names=CSV_FIELDS,
-                delimiter=settings.CSV_DELIMITER,
-            )
+            if csv_file:
+                self.cleaned_data['dataframe'] = read_csv(
+                    csv_file,
+                    names=CSV_FIELDS,
+                    delimiter=settings.CSV_DELIMITER,
+                    encoding=settings.CSV_ENCODING,
+                )
+            else:
+                self.cleaned_data['dataframe'] = read_csv(
+                    StringIO(csv_text),
+                    names=CSV_FIELDS,
+                    delimiter=settings.CSV_DELIMITER,
+                )
 
-        # kontrola spravnosti dat
+            # kontrola spravnosti dat
 
         return cleaned_data
 
