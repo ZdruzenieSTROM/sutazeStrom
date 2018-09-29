@@ -5,16 +5,18 @@
 {% block content %}
 <h1>Udalosti</h1>
 
-<ul>
+<p><div class="list-group">
   {% for event in events %}
-  <li><a href="{% url 'competition:event' event.pk %}">{{ event }}</a></li>
+  <a class="list-group-item list-group-item-action" href="{% url 'competition:event' event.pk %}">{{ event }}</a>
+  {% empty %}
+  <a class="list-group-item list-group-item-action" href="{% url 'admin:index' %}">Vytvoriť udalosť</a>
   {% endfor %}
-</ul>
+</div></p>
 
 <h1>Účastníci</h1>
-<ul>
-  <li><a href="{% url 'participant:import' %}">Import</a></li>
-  <li><a href="{% url 'participant:export' %}">Export</a></li>
-</ul>
 
+<p><div class="list-group">
+  <a class="list-group-item list-group-item-action" href="{% url 'participant:export' %}">Export</a>
+  <a class="list-group-item list-group-item-action" href="{% url 'participant:import' %}">Import</a>
+</div></p>
 {% endblock %}
