@@ -55,6 +55,13 @@ class SubmitFormView(FormView, SingleObjectMixin):
 
         return super(SubmitFormView, self).form_valid(form)
 
+    def form_invalid(self, form):
+        data = form.data.copy()
+        data['code'] = ''
+        form.data = data
+
+        return super(SubmitFormView, self).form_invalid(form)
+
 class ResultsView(DetailView):
     model = Event
     context_object_name = 'event'
