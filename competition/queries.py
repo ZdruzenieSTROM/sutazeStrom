@@ -4,8 +4,8 @@ SELECT
     participant_team.name AS team_name,
     participant_team.school AS school,
     members.names AS team_members,
-    members.compensation AS compensation,
-    SUM(competition_problem.points) + compensation AS points,
+    IFNULL(members.compensation, 0) AS compensation,
+    IFNULL(SUM(competition_problem.points), 0) + IFNULL(members.compensation, 0) AS points,
     hardest.position AS hardest_position,
     hardest.time AS hardest_time
 FROM participant_team
@@ -22,7 +22,7 @@ LEFT OUTER JOIN (
             competition_compensation.points AS compensation,
             participant_participant.team_id
         FROM participant_participant
-        LEFT OUTER JOIN	competition_compensation ON participant_participant.school_class = competition_compensation.school_class
+        JOIN competition_compensation ON participant_participant.school_class = competition_compensation.school_class
         ORDER BY
             last_name ASC,
             first_name ASC
