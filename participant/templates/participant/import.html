@@ -11,17 +11,17 @@
   <div class="alert alert-dismissible alert-danger">
     {{ error }}
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
+      <span aria-hidden="true">&times;</span>
     </button>
   </div>
   {% endfor %}
 
   {% for field in form%}
     {% for error in field.errors %}
-    <div class="alert alert-dismissible alert-danger" role="alert">
+    <div class="alert alert-dismissible alert-danger">
       {{ error }}
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
+        <span aria-hidden="true">&times;</span>
       </button>
     </div>
     {% endfor %}
