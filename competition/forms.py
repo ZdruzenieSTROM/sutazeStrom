@@ -8,6 +8,7 @@ from .models import Event, Problem, Solution
 
 CONTROL = [5, 1, 9, 3, 7]
 
+
 class SubmitForm(forms.Form):
     event = forms.ModelChoiceField(Event.objects.all(), widget=forms.HiddenInput())
     code = forms.CharField(max_length=6, label='', required=True)

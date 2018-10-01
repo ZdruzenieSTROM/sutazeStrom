@@ -10,6 +10,7 @@ class Problem(models.Model):
     def __str__(self):
         return '{}, úloha {}'.format(self.event, self.position)
 
+
 class Solution(models.Model):
     problem = models.ForeignKey('Problem', on_delete=models.CASCADE)
     team = models.ForeignKey('participant.Team', on_delete=models.CASCADE)
@@ -17,6 +18,7 @@ class Solution(models.Model):
 
     def __str__(self):
         return '{}, {}, úloha {}, {}'.format(self.team.event, self.team.name, self.problem.position, self.time)
+
 
 class Event(models.Model):
     name = models.CharField(max_length=100)
@@ -26,6 +28,7 @@ class Event(models.Model):
 
     def __str__(self):
         return '{} {}'.format(self.name, self.date.year)
+
 
 class Compensation(models.Model):
     event = models.ForeignKey('Event', on_delete=models.CASCADE)
