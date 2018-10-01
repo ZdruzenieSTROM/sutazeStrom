@@ -10,24 +10,29 @@
   </head>
   <body>
     <nav class="navbar navbar-expand-sm sticky-top navbar-dark bg-dark">
-      <ul class="navbar-nav">
-          <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'competition:index' %}">Hlavná stránka</a></li>
-      </ul>
-      {% if event %}
-      <ul class="navbar-nav ml-auto">
-          <li class="nav-item"><a class="nav-link active" href="{% url 'competition:event' event.pk %}">{{ event }}</a></li>
-      </ul>
-      {% endif %}
+      <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#navbar-content" aria-controls="navbar-content" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbar-content">
+        <div class="navbar-nav">
+          <a class="nav-item nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'competition:index' %}">Hlavná stránka</a>
+          <a class="nav-item nav-link" href="{% url 'admin:index' %}">Admin</a>
+        </div>
+        {% if event %}
+        <div class="navbar-nav ml-auto">
+          <a class="nav-item nav-link active" href="{% url 'competition:event' event.pk %}">{{ event }}</a>
+        </div>
+        {% endif %}
+      </div>
     </nav>
 
-    <div class="container-fluid" style="padding-top: 16px;">
+    <div class="container-fluid" style="padding-top:16px;">
 
       {% for message in messages %}
         <div class="alert alert-dismissible {% if message.tags %}alert-{{ message.tags }}{% endif %}">
           {{ message }}
           <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
+            <span aria-hidden="true">&times;</span>
           </button>
         </div>
       {% endfor %}

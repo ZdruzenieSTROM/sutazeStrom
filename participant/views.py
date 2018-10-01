@@ -20,16 +20,14 @@ class ImportFormView(FormView):
             form.save()
 
         except:
-            messages.add_message(
+            messages.error(
                 self.request,
-                messages.ERROR,
                 'Chyba pri ukladaní do databázy!'
             )
 
         else:
-            messages.add_message(
+            messages.success(
                 self.request,
-                messages.SUCCESS,
                 'Súbor bol úspešne importovaný'
             )
 

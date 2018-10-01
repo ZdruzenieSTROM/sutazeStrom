@@ -14,11 +14,13 @@ class EventListView(ListView):
 
     template_name = 'competition/index.html'
 
+
 class EventDetailView(DetailView):
     model = Event
     context_object_name = 'event'
 
     template_name = 'competition/event.html'
+
 
 class SubmitFormView(FormView, SingleObjectMixin):
     model = Event
@@ -49,9 +51,14 @@ class SubmitFormView(FormView, SingleObjectMixin):
     def form_valid(self, form):
         solution = form.save()
 
-        messages.add_message(self.request, messages.SUCCESS,\
-                             'Úloha {} bola úspešne odovzdaná tímom {} zo školy {}.'.format(\
-                             solution.problem.position, solution.team.name, solution.team.school))
+        messages.success(
+            self.request,
+            'Úloha {} bola úspešne odovzdaná tímom {} zo školy {}.'.format(
+                solution.problem.position,
+                solution.team.name,
+                solution.team.school
+            )
+        )
 
         return super(SubmitFormView, self).form_valid(form)
 
@@ -61,6 +68,7 @@ class SubmitFormView(FormView, SingleObjectMixin):
         form.data = data
 
         return super(SubmitFormView, self).form_invalid(form)
+
 
 class ResultsView(DetailView):
     model = Event
