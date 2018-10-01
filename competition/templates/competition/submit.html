@@ -35,10 +35,11 @@
 </form>
 
 {% if solutions %}
-<ul class="list-group">
+<div class="list-group">
   {% for solution in solutions %}
-  <li class="list-group-item">{{ solution.team }}, úloha <strong>{{ solution.problem.position }}</strong> <span class="float-right">{{ solution.time|date:"H:i:s (d. m. Y)" }}</span></li>
+  <a class="list-group-item list-group-item-action" href="{% url 'admin:competition_solution_change' solution.pk %}">{{ solution.team }}, úloha <strong>{{ solution.problem.position }}</strong>
+  <span class="float-right">{{ solution.time|date:"H:i:s (d. m. Y)" }}</span></a>
   {% endfor %}
-</ul>
+</div>
 {% endif %}
 {% endblock %}
