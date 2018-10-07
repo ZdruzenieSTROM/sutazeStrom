@@ -45,13 +45,19 @@ class SubmitForm(forms.Form):
 
             try:
                 team = Team.objects.get(event=event, number=number)
-                problem = Problem.objects.get(event=event, position=position)
+                problem = Problem.objects.get(category__event=event, position=position)
 
             except Team.DoesNotExist:
-                raise forms.ValidationError('Číslo tímu {} nezodpovedá registrovanému tímu!'.format(number), code='team_does_not_exist')
+                raise forms.ValidationError(
+                    'Číslo tímu {} nezodpovedá registrovanému tímu!'.format(number),
+                    code='team_does_not_exist'
+                )
 
             except Problem.DoesNotExist:
-                raise forms.ValidationError('Úloha číslo {} v tejto súťaži neexistuje!'.format(position), code='problem_does_not_exist')
+                raise forms.ValidationError(
+                    'Úloha číslo {} v tejto súťaži neexistuje!'.format(position),
+                    code='problem_does_not_exist'
+                )
 
             else:
                 self.cleaned_data['team'] = team
@@ -64,9 +70,17 @@ class SubmitForm(forms.Form):
                     pass
 
                 else:
-                    raise forms.ValidationError('Táto úloha už bola odovzdaná v čase {}! ({})'.format(solution.time.strftime('%H:%M:%S (%d. %m. %Y)'), code))
+                    raise forms.ValidationError(
+                        'Táto úloha už bola odovzdaná v čase {}! ({})'.format(
+                            solution.time.strftime('%H:%M:%S (%d. %m. %Y)'),
+                            code
+                        )
+                    )
 
         return cleaned_data
 
     def save(self):
-        return Solution.objects.create(team=self.cleaned_data['team'], problem=self.cleaned_data['problem'])
+        return Solution.objects.create(
+            team=self.cleaned_data['team'],
+            problem=self.cleaned_data['problem']
+        )

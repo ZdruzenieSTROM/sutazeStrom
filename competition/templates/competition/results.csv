@@ -1,0 +1,2 @@
+{% for team in teams %}{{ team.place }}{{ delimiter }}{{ team.name }}{{ delimiter }}{{ team.school }}{{ delimiter }}{{ team.members }}{{ delimiter }}{{ team.compensation }}{{ delimiter }}{% for category in team.categories %}{{ category.count }}{{ delimiter }}{% endfor %}{{ team.problem_points }}{{ delimiter }}{{ team.points }}
+{% endfor %}
