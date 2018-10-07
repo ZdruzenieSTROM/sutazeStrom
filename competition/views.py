@@ -1,11 +1,16 @@
+from operator import itemgetter
+
+from django.conf import settings
 from django.contrib import messages
+from django.db.models import Count, Q, Sum
 from django.shortcuts import reverse
 from django.views.generic import DetailView, FormView, ListView
 from django.views.generic.detail import SingleObjectMixin
 
+from participant.models import Team
+
 from .forms import SubmitForm
-from .models import Event, Solution
-from .queries import RESULTS_QUERY
+from .models import Event, ProblemCategory, Solution
 
 
 class EventListView(ListView):
@@ -78,6 +83,74 @@ class ResultsView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ResultsView, self).get_context_data(**kwargs)
-        context['results'] = Solution.objects.raw(RESULTS_QUERY, [self.kwargs['pk']])
+
+        results = generate_results(self.object)
+        context['categories'], context['teams'] = results[0], results[1]
 
         return context
+
+
+class CSVResultsView(DetailView):
+    model = Event
+    context_object_name = 'event'
+
+    template_name = 'competition/results.csv'
+
+    def get_context_data(self, **kwargs):
+        context = super(CSVResultsView, self).get_context_data(**kwargs)
+
+        results = generate_results(self.object)
+        context['categories'], context['teams'] = results[0], results[1]
+
+        context['delimiter'] = settings.CSV_DELIMITER
+
+        return context
+
+
+def generate_results(event):
+    categories = ProblemCategory.objects.filter(event=event).order_by('position')
+
+    teams = [
+        {
+            'name': team.name,
+            'school': team.school,
+            # TODO: sort members alphabetically
+            'members': ', '.join([
+                '{} {}'.format(member.first_name, member.last_name)
+                for member in team.participant_set.all()
+            ]),
+            **team.participant_set.aggregate(compensation=Sum('compensation__points')),
+            'categories': [
+                {
+                    'points': category.points,
+                    **team.solution_set.aggregate(
+                        count=Count('problem', filter=Q(problem__category=category))
+                    )
+                } for category in categories
+            ]
+        } for team in Team.objects.filter(event=event)
+    ]
+
+    for team in teams:
+        team['problem_points'] = sum(
+            [category['points'] * category['count'] for category in team['categories']]
+        )
+        team['points'] = team['problem_points'] + team['compensation']
+
+    comp = itemgetter('points', 'problem_points')
+
+    teams = sorted(
+        teams,
+        key=comp,
+        reverse=True
+    )
+
+    place = 1
+
+    for i in range(len(teams)):
+        teams[i]['place'] = place
+
+        if i < len(teams)-1 and comp(teams[i]) != comp(teams[i+1]):
+            place += 1
+
+    return (categories, teams)

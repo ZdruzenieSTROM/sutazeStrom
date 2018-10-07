@@ -45,3 +45,11 @@
 </div>
 {% endif %}
 {% endblock %}
+
+{% block javascript %}
+<script>
+$(function() {
+  $("#id_code").focus();
+});
+</script>
+{% endblock %}

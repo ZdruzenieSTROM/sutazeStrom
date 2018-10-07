@@ -2,6 +2,8 @@
 
 {% block title %}{{ event }} &ndash; Výsledky{% endblock %}
 
+{% block meta %}<meta http-equiv="refresh" content="30" />{% endblock %}
+
 {% block content %}
 <table class="table">
   <thead>
@@ -11,22 +13,26 @@
       <th scope="col">Škola</th>
       <th scope="col">Účastníci</th>
       <th scope="col">Bonifikácia</th>
-      <th scope="col">Body</th>
-      <th scope="col">Najťažšia vyriešená úloha</th>
-      <th scope="col">Čas odovzdania najťažšej úlohy</th>
+      {% for category in categories %}
+      <th scope="col">{{ category.name }}</th>
+      {% endfor %}
+      <th scope="col">Príklady</th>
+      <th scope="col">Spolu</th>
     </tr>
   </thead>
   <tbody>
-    {% for team in results %}
+    {% for team in teams %}
     <tr>
-      <th scope="row">{{ forloop.counter }}</th>
-      <td>{{ team.team_name }}</td>
+      <th scope="row">{{ team.place }}</th>
+      <td>{{ team.name }}</td>
       <td>{{ team.school }}</td>
-      <td>{{ team.team_members }}</td>
+      <td>{{ team.members }}</td>
       <td>{{ team.compensation }}</td>
+      {% for category in team.categories %}
+      <td>{{ category.count }}</td>
+      {% endfor %}
+      <td>{{ team.problem_points }}</td>
       <td>{{ team.points }}</td>
-      <td>{{ team.hardest_position }}</td>
-      <td>{{ team.hardest_time|date:"H:i:s (d. m. Y)" }}</td>
     </tr>
     {% endfor %}
   </tbody>
