@@ -4,6 +4,9 @@ from django import forms
 from django.conf import settings
 from pandas import read_csv
 
+from competition.models import Event
+from .models import *
+
 CSV_FIELDS = [
     'tim',
     'skola',
@@ -43,14 +46,19 @@ CSV_FIELDS = [
     'cislo_timu',
 ]
 
+def new_number():
+    pass
+
 class ImportForm(forms.Form):
     csv_text = forms.CharField(widget=forms.Textarea, required=False, label='')
     csv_file = forms.FileField(required=False, label='')
+    event = forms.ModelChoiceField(queryset=Event.objects.all())
 
     def __init__(self, *args, **kwargs):
         super(ImportForm, self).__init__(*args, **kwargs)
         self.fields['csv_text'].widget.attrs.update({'class': 'form-control'})
         self.fields['csv_file'].widget.attrs.update({'class': 'form-control-file'})
+        self.fields['event'].widget.attrs.update({'class': 'form-event'})
 
     def clean_csv_file(self):
         csv_file = self.cleaned_data['csv_file']
@@ -65,9 +73,13 @@ class ImportForm(forms.Form):
 
         if not self.errors:
             csv_file, csv_text = cleaned_data['csv_file'], cleaned_data['csv_text']
+            event = cleaned_data['event']
 
             if not (csv_file or csv_text):
                 raise forms.ValidationError('Súbor ani textový vstup neobsahujú žiadne dáta!')
+
+            if not event:
+                raise forms.ValidationError('Vyber event!')
 
             if csv_file and csv_text:
                 raise forms.ValidationError('Vyber si len jeden zdroj údajov!')
@@ -86,10 +98,21 @@ class ImportForm(forms.Form):
                     delimiter=settings.CSV_DELIMITER,
                 )
 
-            # kontrola spravnosti dat
-
         return cleaned_data
 
     def save(self):
-        # ulozenie dat
-        pass
+        event = self.cleaned_data['event']
+        teams = self.cleaned_data['dataframe']['tim']
+        schools = self.cleaned_data['dataframe']['skola']
+        participants = self.cleaned_data['dataframe']['pocet_clenov']
+
+        k = len(teams)
+        for i in range(k):
+            team_ = Team.objects.create(
+                name=teams[i],
+                number=new_number(),
+                school=schools[i],
+                event=event
+            )
+
+        # daco dalsie
