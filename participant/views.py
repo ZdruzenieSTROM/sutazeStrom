@@ -16,6 +16,7 @@ class ImportFormView(FormView):
         return reverse('participant:import')
 
     def form_valid(self, form):
+        '''
         try:
             form.save()
 
@@ -30,6 +31,8 @@ class ImportFormView(FormView):
                 self.request,
                 'Súbor bol úspešne importovaný'
             )
+        '''
+        form.save()
 
         return super(ImportFormView, self).form_valid(form)
 

@@ -46,13 +46,89 @@ CSV_FIELDS = [
     'cislo_timu',
 ]
 
+ROCNIK_1 = [
+    'prvý',
+]
+
+ROCNIK_2 = [
+    'druhý',
+]
+
+ROCNIK_3 = [
+    'tretí',
+]
+
+ROCNIK_4 = [
+    'štvrtý',
+]
+
+ROCNIK_5 = [
+    'piaty',
+]
+
+ROCNIK_6 = [
+    'šiesty',
+    'príma',
+]
+
+ROCNIK_7 = [
+    'siedmy',
+    'sekunda',
+]
+
+ROCNIK_8 = [
+    'ôsmy',
+    'tercia',
+]
+
+ROCNIK_9 = [
+    'deviaty',
+    'kvarta',
+]
+
+def resolve_class(name):
+    name = str(name)
+    if name in ROCNIK_1:
+        return 1
+    elif name in ROCNIK_2:
+        return 2
+    elif name in ROCNIK_3:
+        return 3
+    elif name in ROCNIK_4:
+        return 4
+    elif name in ROCNIK_5:
+        return 5
+    elif name in ROCNIK_6:
+        return 6
+    elif name in ROCNIK_7:
+        return 7
+    elif name in ROCNIK_8:
+        return 8
+    elif name in ROCNIK_9:
+        return 9
+    else:
+        return None
+
 def new_number():
-    pass
+    found = False
+    x = 100
+    existing = []
+    for team in Team.objects.all():
+        existing.append(team.number)
+
+    while not found:
+        if x in existing:
+            x += 1
+        else:
+            found = True
+            return x
+
 
 class ImportForm(forms.Form):
+    event = forms.ModelChoiceField(queryset=Event.objects.all(), label='Vyber súťaž')
+
     csv_text = forms.CharField(widget=forms.Textarea, required=False, label='')
     csv_file = forms.FileField(required=False, label='')
-    event = forms.ModelChoiceField(queryset=Event.objects.all())
 
     def __init__(self, *args, **kwargs):
         super(ImportForm, self).__init__(*args, **kwargs)
@@ -100,13 +176,56 @@ class ImportForm(forms.Form):
 
         return cleaned_data
 
+    'ucastnik1_meno'
+    'ucastnik1_priezvisko'
+    'ucastnik1_rocnik'
+
     def save(self):
         event = self.cleaned_data['event']
         teams = self.cleaned_data['dataframe']['tim']
         schools = self.cleaned_data['dataframe']['skola']
         participants = self.cleaned_data['dataframe']['pocet_clenov']
 
+        u1_names = self.cleaned_data['dataframe']['ucastnik1_meno']
+        u1_surnames = self.cleaned_data['dataframe']['ucastnik1_priezvisko']
+        u1_classes = self.cleaned_data['dataframe']['ucastnik1_rocnik']
+
+        u2_names = self.cleaned_data['dataframe']['ucastnik1_meno']
+        u2_surnames = self.cleaned_data['dataframe']['ucastnik1_priezvisko']
+        u2_classes = self.cleaned_data['dataframe']['ucastnik1_rocnik']
+
+        u3_names = self.cleaned_data['dataframe']['ucastnik1_meno']
+        u3_surnames = self.cleaned_data['dataframe']['ucastnik1_priezvisko']
+        u3_classes = self.cleaned_data['dataframe']['ucastnik1_rocnik']
+
+        u4_names = self.cleaned_data['dataframe']['ucastnik1_meno']
+        u4_surnames = self.cleaned_data['dataframe']['ucastnik1_priezvisko']
+        u4_classes = self.cleaned_data['dataframe']['ucastnik1_rocnik']
+
         k = len(teams)
+        participant_data = [
+            [
+                u1_names,
+                u1_surnames,
+                u1_classes
+            ],
+            [
+                u2_names,
+                u2_surnames,
+                u2_classes
+            ],
+            [
+                u3_names,
+                u3_surnames,
+                u3_classes
+            ],
+            [
+                u4_names,
+                u4_surnames,
+                u4_classes
+            ]
+        ]
+
         for i in range(k):
             team_ = Team.objects.create(
                 name=teams[i],
@@ -115,4 +234,17 @@ class ImportForm(forms.Form):
                 event=event
             )
 
-        # daco dalsie
+            for j in range(participants[i]):
+                class_ = resolve_class(participant_data[j][2][i])
+                comp_ = Compensation.objects.get(
+                    event=event,
+                    school_class=class_,
+                )
+
+                Participant.objects.create(
+                    first_name=participant_data[j][0][i],
+                    last_name=participant_data[j][1][i],
+                    team=team_,
+                    compensation=comp_,
+                )
+
