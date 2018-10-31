@@ -48,8 +48,14 @@
 
 {% block javascript %}
 <script>
-$(function() {
-  $("#id_code").focus();
-});
+    var input = document.getElementById("id_code"),
+    focuser = function () {
+        input.focus();
+    };
+
+    focuser();
+    input.onblur = function () {
+      setTimeout(focuser, 0);
+    };
 </script>
 {% endblock %}
