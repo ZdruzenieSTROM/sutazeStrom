@@ -1,9 +1,15 @@
+import os
+import io
+from django.conf import settings
+from django.http import HttpResponse, FileResponse, Http404
+
 from django.contrib import messages
-from django.http import HttpResponse
 from django.shortcuts import reverse
+
+from django.core import management
+
 from django.views import View
 from django.views.generic.edit import FormView
-
 from .forms import ImportForm
 
 
@@ -36,4 +42,11 @@ class ImportFormView(FormView):
 
 class ExportView(View):
     def get(self, request):
-        return HttpResponse('Tu casom pribudne mozny export dat...')
+        buffer = io.BytesIO()
+        JSONfile = 'db' + '.json'
+        management.call_command('dumpdata', format='json', output=JSONfile)
+        file_path = os.path.join(settings.BASE_DIR, JSONfile)
+
+        if os.path.exists(file_path):
+            return FileResponse(buffer, as_attachment=True, filename=JSONfile)
+        raise Http404
