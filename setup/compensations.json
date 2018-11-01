@@ -1,0 +1,83 @@
+[
+{
+  "model": "participant.compensation",
+  "pk": 1,
+  "fields": {
+    "event": 1,
+    "points": 1,
+    "school_class": 1
+  }
+},
+{
+  "model": "participant.compensation",
+  "pk": 2,
+  "fields": {
+    "event": 1,
+    "points": 1,
+    "school_class": 2
+  }
+},
+{
+  "model": "participant.compensation",
+  "pk": 3,
+  "fields": {
+    "event": 1,
+    "points": 1,
+    "school_class": 3
+  }
+},
+{
+  "model": "participant.compensation",
+  "pk": 4,
+  "fields": {
+    "event": 1,
+    "points": 1,
+    "school_class": 4
+  }
+},
+{
+  "model": "participant.compensation",
+  "pk": 5,
+  "fields": {
+    "event": 1,
+    "points": 1,
+    "school_class": 5
+  }
+},
+{
+  "model": "participant.compensation",
+  "pk": 6,
+  "fields": {
+    "event": 1,
+    "points": 1,
+    "school_class": 6
+  }
+},
+{
+  "model": "participant.compensation",
+  "pk": 7,
+  "fields": {
+    "event": 1,
+    "points": 1,
+    "school_class": 7
+  }
+},
+{
+  "model": "participant.compensation",
+  "pk": 8,
+  "fields": {
+    "event": 1,
+    "points": 1,
+    "school_class": 8
+  }
+},
+{
+  "model": "participant.compensation",
+  "pk": 9,
+  "fields": {
+    "event": 1,
+    "points": 1,
+    "school_class": 9
+  }
+}
+]

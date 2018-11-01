@@ -1,0 +1,32 @@
+[
+{
+  "model": "competition.problemcategory",
+  "pk": 1,
+  "fields": {
+    "name": "\u013dahk\u00e1",
+    "event": 1,
+    "position": 1,
+    "points": 1
+  }
+},
+{
+  "model": "competition.problemcategory",
+  "pk": 2,
+  "fields": {
+    "name": "Stredn\u00e1",
+    "event": 1,
+    "position": 20,
+    "points": 3
+  }
+},
+{
+  "model": "competition.problemcategory",
+  "pk": 3,
+  "fields": {
+    "name": "\u0164a\u017ek\u00e1",
+    "event": 1,
+    "position": 30,
+    "points": 5
+  }
+}
+]

@@ -1,0 +1,10 @@
+[
+{
+  "model": "competition.problem",
+  "pk": 1,
+  "fields": {
+    "position": 1,
+    "category": 1
+  }
+}
+]
