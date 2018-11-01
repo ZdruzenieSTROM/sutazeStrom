@@ -202,7 +202,7 @@ class ImportForm(forms.Form):
         u4_surnames = self.cleaned_data['dataframe']['ucastnik1_priezvisko']
         u4_classes = self.cleaned_data['dataframe']['ucastnik1_rocnik']
 
-        k = len(teams)
+        k = len(teams) + 1
         participant_data = [
             [
                 u1_names,
@@ -226,7 +226,7 @@ class ImportForm(forms.Form):
             ]
         ]
 
-        for i in range(k):
+        for i in range(1, k):
             team_ = Team.objects.create(
                 name=teams[i],
                 number=new_number(),
@@ -234,7 +234,7 @@ class ImportForm(forms.Form):
                 event=event
             )
 
-            for j in range(participants[i]):
+            for j in range(int(participants[i])):
                 class_ = resolve_class(participant_data[j][2][i])
                 comp_ = Compensation.objects.get(
                     event=event,
