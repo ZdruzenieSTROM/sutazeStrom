@@ -120,11 +120,13 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
+
 # CSV files
 
 CSV_DELIMITER = ';'
 
 CSV_ENCODING = 'utf8'
+
 
 # Messages
 

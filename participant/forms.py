@@ -46,86 +46,26 @@ CSV_FIELDS = [
     'cislo_timu',
 ]
 
-ROCNIK_1 = [
-    'prvý',
-]
-
-ROCNIK_2 = [
-    'druhý',
-]
-
-ROCNIK_3 = [
-    'tretí',
-]
-
-ROCNIK_4 = [
-    'štvrtý',
-]
-
-ROCNIK_5 = [
-    'piaty',
-]
-
-ROCNIK_6 = [
-    'šiesty',
-    'príma',
-]
-
-ROCNIK_7 = [
-    'siedmy',
-    'sekunda',
-]
-
-ROCNIK_8 = [
-    'ôsmy',
-    'tercia',
-]
-
-ROCNIK_9 = [
-    'deviaty',
-    'kvarta',
-]
-
-def resolve_class(name):
-    name = str(name)
-    if name in ROCNIK_1:
-        return 1
-    elif name in ROCNIK_2:
-        return 2
-    elif name in ROCNIK_3:
-        return 3
-    elif name in ROCNIK_4:
-        return 4
-    elif name in ROCNIK_5:
-        return 5
-    elif name in ROCNIK_6:
-        return 6
-    elif name in ROCNIK_7:
-        return 7
-    elif name in ROCNIK_8:
-        return 8
-    elif name in ROCNIK_9:
-        return 9
-    else:
-        return None
-
-def new_number():
-    found = False
-    x = 100
-    existing = []
-    for team in Team.objects.all():
-        existing.append(team.number)
-
-    while not found:
-        if x in existing:
-            x += 1
-        else:
-            found = True
-            return x
+ROCNIKY = {
+    'prvý': 1,
+    'druhý': 2,
+    'tretí': 3,
+    'štvrtý': 4,
+    'piaty': 5,
+    'šiesty': 6,
+    'príma': 6,
+    'siedmy': 7,
+    'sekunda': 7,
+    'ôsmy': 8,
+    'tercia': 8,
+    'deviaty': 9,
+    'kvarta': 9,
+}
 
 
 class ImportForm(forms.Form):
-    event = forms.ModelChoiceField(queryset=Event.objects.all(), label='Vyber súťaž')
+    event = forms.ModelChoiceField(
+        queryset=Event.objects.all(), label='Vyber súťaž')
 
     csv_text = forms.CharField(widget=forms.Textarea, required=False, label='')
     csv_file = forms.FileField(required=False, label='')
@@ -133,14 +73,16 @@ class ImportForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(ImportForm, self).__init__(*args, **kwargs)
         self.fields['csv_text'].widget.attrs.update({'class': 'form-control'})
-        self.fields['csv_file'].widget.attrs.update({'class': 'form-control-file'})
+        self.fields['csv_file'].widget.attrs.update(
+            {'class': 'form-control-file'})
         self.fields['event'].widget.attrs.update({'class': 'form-event'})
 
     def clean_csv_file(self):
         csv_file = self.cleaned_data['csv_file']
 
         if csv_file and not csv_file.name.endswith('.csv'):
-            raise forms.ValidationError('Nesprávna prípona súboru, akceptovaná je len CSV!')
+            raise forms.ValidationError(
+                'Nesprávna prípona súboru, akceptovaná je len CSV!')
 
         return csv_file
 
@@ -152,7 +94,8 @@ class ImportForm(forms.Form):
             event = cleaned_data['event']
 
             if not (csv_file or csv_text):
-                raise forms.ValidationError('Súbor ani textový vstup neobsahujú žiadne dáta!')
+                raise forms.ValidationError(
+                    'Súbor ani textový vstup neobsahujú žiadne dáta!')
 
             if not event:
                 raise forms.ValidationError('Vyber event!')
@@ -176,11 +119,10 @@ class ImportForm(forms.Form):
 
         return cleaned_data
 
-    'ucastnik1_meno'
-    'ucastnik1_priezvisko'
-    'ucastnik1_rocnik'
-
     def save(self):
+        def next_team_number():
+            return Team.objects.order_by('number').first().number + 1
+
         event = self.cleaned_data['event']
         teams = self.cleaned_data['dataframe']['tim']
         schools = self.cleaned_data['dataframe']['skola']
@@ -227,24 +169,23 @@ class ImportForm(forms.Form):
         ]
 
         for i in range(1, k):
-            team_ = Team.objects.create(
+            team = Team.objects.create(
                 name=teams[i],
-                number=new_number(),
+                number=next_team_number(),
                 school=schools[i],
                 event=event
             )
 
             for j in range(int(participants[i])):
-                class_ = resolve_class(participant_data[j][2][i])
-                comp_ = Compensation.objects.get(
+                school_class = ROCNIKY[participant_data[j][2][i]]
+                compensation = Compensation.objects.get(
                     event=event,
-                    school_class=class_,
+                    school_class=school_class,
                 )
 
                 Participant.objects.create(
                     first_name=participant_data[j][0][i],
                     last_name=participant_data[j][1][i],
-                    team=team_,
-                    compensation=comp_,
+                    team=team,
+                    compensation=compensation,
                 )
-

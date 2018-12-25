@@ -1,15 +1,14 @@
-import os
 import io
+import os
+
 from django.conf import settings
-from django.http import HttpResponse, FileResponse, Http404
-
 from django.contrib import messages
-from django.shortcuts import reverse
-
 from django.core import management
-
+from django.http import FileResponse, Http404, HttpResponse
+from django.shortcuts import reverse
 from django.views import View
 from django.views.generic.edit import FormView
+
 from .forms import ImportForm
 
 

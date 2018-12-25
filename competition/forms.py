@@ -10,7 +10,8 @@ CONTROL = [5, 1, 9, 3, 7]
 
 
 class SubmitForm(forms.Form):
-    event = forms.ModelChoiceField(Event.objects.all(), widget=forms.HiddenInput())
+    event = forms.ModelChoiceField(
+        Event.objects.all(), widget=forms.HiddenInput())
     code = forms.CharField(max_length=6, label='', required=True)
 
     def __init__(self, *args, **kwargs):
@@ -22,15 +23,18 @@ class SubmitForm(forms.Form):
             code = [int(c) for c in self.cleaned_data['code']]
 
         except ValueError:
-            raise forms.ValidationError('Nesprávny formát!', code='invalid_format')
+            raise forms.ValidationError(
+                'Nesprávny formát!', code='invalid_format')
 
         if len(code) != 6:
-            raise forms.ValidationError('Nesprávna dĺžka kódu!', code='invalid_length')
+            raise forms.ValidationError(
+                'Nesprávna dĺžka kódu!', code='invalid_length')
 
         control_digit, code = code[-1], code[:-1]
 
         if control_digit != reduce(lambda p, n: p + n[0]*n[1], zip(code, CONTROL), 0) % 10:
-            raise forms.ValidationError('Neplatný kontrolný súčet!', code='invalid_control_sum')
+            raise forms.ValidationError(
+                'Neplatný kontrolný súčet!', code='invalid_control_sum')
 
         return reduce(lambda p, n: p*10 + n, code)
 
@@ -45,17 +49,20 @@ class SubmitForm(forms.Form):
 
             try:
                 team = Team.objects.get(event=event, number=number)
-                problem = Problem.objects.get(category__event=event, position=position)
+                problem = Problem.objects.get(
+                    category__event=event, position=position)
 
             except Team.DoesNotExist:
                 raise forms.ValidationError(
-                    'Číslo tímu {} nezodpovedá registrovanému tímu!'.format(number),
+                    'Číslo tímu {} nezodpovedá registrovanému tímu!'.format(
+                        number),
                     code='team_does_not_exist'
                 )
 
             except Problem.DoesNotExist:
                 raise forms.ValidationError(
-                    'Úloha číslo {} v tejto súťaži neexistuje!'.format(position),
+                    'Úloha číslo {} v tejto súťaži neexistuje!'.format(
+                        position),
                     code='problem_does_not_exist'
                 )
 

@@ -49,7 +49,8 @@ class SubmitFormView(FormView, SingleObjectMixin):
     def get_context_data(self, **kwargs):
         context = super(SubmitFormView, self).get_context_data(**kwargs)
 
-        context['solutions'] = Solution.objects.filter(team__event=self.object).order_by('-time')[:10]
+        context['solutions'] = Solution.objects.filter(
+            team__event=self.object).order_by('-time')[:10]
 
         return context
 
@@ -108,7 +109,8 @@ class CSVResultsView(DetailView):
 
 
 def generate_results(event):
-    categories = ProblemCategory.objects.filter(event=event).order_by('position')
+    categories = ProblemCategory.objects.filter(
+        event=event).order_by('position')
 
     teams = [
         {
@@ -124,7 +126,8 @@ def generate_results(event):
                 {
                     'points': category.points,
                     **team.solution_set.aggregate(
-                        count=Count('problem', filter=Q(problem__category=category))
+                        count=Count('problem', filter=Q(
+                            problem__category=category))
                     )
                 } for category in categories
             ]
@@ -133,7 +136,8 @@ def generate_results(event):
 
     for team in teams:
         team['problem_points'] = sum(
-            [category['points'] * category['count'] for category in team['categories']]
+            [category['points'] * category['count']
+                for category in team['categories']]
         )
         team['points'] = team['problem_points'] + team['compensation']
 

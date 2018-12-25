@@ -4,7 +4,8 @@ from django.db import models
 
 class Team(models.Model):
     name = models.CharField(max_length=200)
-    number = models.PositiveSmallIntegerField(unique=True, validators=[MinValueValidator(100), MaxValueValidator(999)])
+    number = models.PositiveSmallIntegerField(
+        unique=True, validators=[MinValueValidator(100), MaxValueValidator(999)])
 
     school = models.CharField(max_length=300)
 
