@@ -1,10 +1,9 @@
-import io
 import os
 
 from django.conf import settings
 from django.contrib import messages
 from django.core import management
-from django.http import FileResponse, Http404, HttpResponse
+from django.http import FileResponse, HttpResponse
 from django.shortcuts import reverse
 from django.views import View
 from django.views.generic.edit import FormView
@@ -21,31 +20,25 @@ class ImportFormView(FormView):
         return reverse('participant:import')
 
     def form_valid(self, form):
-        try:
-            form.save()
+        form.save()
 
-        except:
-            messages.error(
-                self.request,
-                'Chyba pri ukladaní do databázy!'
-            )
-
-        else:
-            messages.success(
-                self.request,
-                'Súbor bol úspešne importovaný'
-            )
+        messages.success(
+            self.request,
+            'Súbor bol úspešne importovaný'
+        )
 
         return super(ImportFormView, self).form_valid(form)
 
 
 class ExportView(View):
     def get(self, request):
-        buffer = io.BytesIO()
-        JSONfile = 'db' + '.json'
-        management.call_command('dumpdata', format='json', output=JSONfile)
-        file_path = os.path.join(settings.BASE_DIR, JSONfile)
+        file_name = 'db' + '.json'
+        management.call_command('dumpdata', format='json', output=file_name)
+        file_path = os.path.join(settings.BASE_DIR, file_name)
 
-        if os.path.exists(file_path):
-            return FileResponse(buffer, as_attachment=True, filename=JSONfile)
-        raise Http404
+        json_file = open(file_path, 'rb')
+
+        if not os.path.exists(file_path):
+            return HttpResponse(status=500)
+
+        return FileResponse(json_file, as_attachment=True, filename=file_name)

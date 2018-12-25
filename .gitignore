@@ -3,4 +3,5 @@ __pycache__/
 */migrations/*
 !*/migrations/__init__.py
 db.sqlite3
+db.json
 sutaze/
