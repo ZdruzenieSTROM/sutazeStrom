@@ -1,10 +1,12 @@
+import csv
 from operator import itemgetter
 
 from django.conf import settings
 from django.contrib import messages
 from django.db.models import Count, Q, Sum
+from django.http import HttpResponse
 from django.shortcuts import reverse
-from django.views.generic import DetailView, FormView, ListView
+from django.views.generic import DetailView, FormView, ListView, View
 from django.views.generic.detail import SingleObjectMixin
 
 from participant.models import Team
@@ -27,7 +29,29 @@ class EventDetailView(DetailView):
     template_name = 'competition/event.html'
 
 
-class SubmitFormView(FormView, SingleObjectMixin):
+class SingleObjectFormView(FormView, SingleObjectMixin):
+    object_field_name = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        return super(SingleObjectFormView, self).dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super(SingleObjectFormView, self).get_form_kwargs()
+
+        if self.request.method in ('POST', 'PUT'):
+            data = kwargs['data'].copy()
+            data[self.object_field_name] = str(self.object.pk)
+            kwargs['data'] = data
+
+        if self.request.method == 'GET':
+            kwargs['initial'].update({self.object_field_name: self.object})
+
+        return kwargs
+
+
+class SubmitFormView(SingleObjectFormView):
     model = Event
     context_object_name = 'event'
 
@@ -35,10 +59,7 @@ class SubmitFormView(FormView, SingleObjectMixin):
 
     form_class = SubmitForm
 
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-
-        return super(SubmitFormView, self).dispatch(request, *args, **kwargs)
+    object_field_name = 'competition'
 
     def get_success_url(self):
         return reverse('competition:submit', kwargs={'pk': self.kwargs['pk']})
@@ -85,27 +106,34 @@ class ResultsView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(ResultsView, self).get_context_data(**kwargs)
 
-        results = generate_results(self.object)
-        context['categories'], context['teams'] = results[0], results[1]
+        context['categories'], context['teams'] = generate_results(self.object)
 
         return context
 
 
-class CSVResultsView(DetailView):
+class CSVResultsView(View, SingleObjectMixin):
     model = Event
     context_object_name = 'event'
 
-    template_name = 'competition/results.csv'
+    def get(self, request, pk):
+        self.object = self.get_object()
 
-    def get_context_data(self, **kwargs):
-        context = super(CSVResultsView, self).get_context_data(**kwargs)
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="export.csv"'
 
-        results = generate_results(self.object)
-        context['categories'], context['teams'] = results[0], results[1]
+        _, teams = generate_results(self.object)
 
-        context['delimiter'] = settings.CSV_DELIMITER
+        writer = csv.writer(response, delimiter=settings.CSV_DELIMITER)
 
-        return context
+        for team in teams:
+            row = [team['place'], team['name'], team['school'],
+                   team['members'], team['compensation']]
+            row.extend([category['count'] for category in team['categories']])
+            row.extend([team['problem_points'], team['points']])
+
+            writer.writerow(row)
+
+        return response
 
 
 def generate_results(event):
@@ -137,7 +165,7 @@ def generate_results(event):
     for team in teams:
         team['problem_points'] = sum(
             [category['points'] * category['count']
-                for category in team['categories']]
+             for category in team['categories']]
         )
         team['points'] = team['problem_points'] + team['compensation']
 
@@ -151,7 +179,7 @@ def generate_results(event):
 
     place = 1
 
-    for i in range(len(teams)):
+    for i, _ in enumerate(teams):
         teams[i]['place'] = place
 
         if i < len(teams)-1 and comp(teams[i]) != comp(teams[i+1]):

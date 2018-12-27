@@ -23,18 +23,15 @@ class SubmitForm(forms.Form):
             code = [int(c) for c in self.cleaned_data['code']]
 
         except ValueError:
-            raise forms.ValidationError(
-                'Nesprávny formát!', code='invalid_format')
+            raise forms.ValidationError('Nesprávny formát!')
 
         if len(code) != 6:
-            raise forms.ValidationError(
-                'Nesprávna dĺžka kódu!', code='invalid_length')
+            raise forms.ValidationError('Nesprávna dĺžka kódu!')
 
         control_digit, code = code[-1], code[:-1]
 
         if control_digit != reduce(lambda p, n: p + n[0]*n[1], zip(code, CONTROL), 0) % 10:
-            raise forms.ValidationError(
-                'Neplatný kontrolný súčet!', code='invalid_control_sum')
+            raise forms.ValidationError('Neplatný kontrolný súčet!')
 
         return reduce(lambda p, n: p*10 + n, code)
 
@@ -55,15 +52,13 @@ class SubmitForm(forms.Form):
             except Team.DoesNotExist:
                 raise forms.ValidationError(
                     'Číslo tímu {} nezodpovedá registrovanému tímu!'.format(
-                        number),
-                    code='team_does_not_exist'
+                        number)
                 )
 
             except Problem.DoesNotExist:
                 raise forms.ValidationError(
                     'Úloha číslo {} v tejto súťaži neexistuje!'.format(
-                        position),
-                    code='problem_does_not_exist'
+                        position)
                 )
 
             else:
@@ -87,7 +82,9 @@ class SubmitForm(forms.Form):
         return cleaned_data
 
     def save(self):
-        return Solution.objects.create(
+        solution = Solution.objects.create(
             team=self.cleaned_data['team'],
             problem=self.cleaned_data['problem']
         )
+
+        return solution

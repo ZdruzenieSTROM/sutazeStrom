@@ -13,6 +13,6 @@ urlpatterns = [
          staff_member_required(SubmitFormView.as_view()), name='submit'),
     path('<int:pk>/results/',
          staff_member_required(ResultsView.as_view()), name='results'),
-    path('<int:pk>/results.csv/',
+    path('<int:pk>/csvresults/',
          staff_member_required(CSVResultsView.as_view()), name='csv_results'),
 ]
