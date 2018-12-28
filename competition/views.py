@@ -137,14 +137,14 @@ def generate_results(event):
     categories = ProblemCategory.objects.filter(
         event=event).order_by('position')
 
+    # Pull information about teams from database
     teams = [
         {
             'name': team.name,
             'school': team.school,
-            # TODO: sort members alphabetically
             'members': ', '.join([
                 '{} {}'.format(member.first_name, member.last_name)
-                for member in team.participant_set.all()
+                for member in team.participant_set.order_by('last_name', 'first_name')
             ]),
             **team.participant_set.aggregate(compensation=Sum('compensation__points')),
             'categories': [
@@ -159,6 +159,7 @@ def generate_results(event):
         } for team in Team.objects.filter(event=event)
     ]
 
+    # Compute points
     for team in teams:
         team['problem_points'] = sum(
             [category['points'] * category['count']
@@ -166,16 +167,19 @@ def generate_results(event):
         )
         team['points'] = team['problem_points'] + team['compensation']
 
+    # Sort teams
     comp = itemgetter('points', 'problem_points')
+    teams.sort(key=comp, reverse=True)
 
-    teams = sorted(teams, key=comp, reverse=True)
+    # Generate ranks
+    rank = 1
 
-    place = 1
+    for i, _ in enumerate(teams[:-1]):
+        teams[i]['rank'] = rank
 
-    for i, _ in enumerate(teams):
-        teams[i]['place'] = place
+        if comp(teams[i]) != comp(teams[i+1]):
+            rank += 1
 
-        if i < len(teams)-1 and comp(teams[i]) != comp(teams[i+1]):
-            place += 1
+    teams[-1]['rank'] = rank
 
     return (categories, teams)

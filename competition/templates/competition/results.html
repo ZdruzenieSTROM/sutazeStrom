@@ -2,7 +2,9 @@
 
 {% block title %}{{ event }} &ndash; Výsledky{% endblock %}
 
-{% block meta %}<meta http-equiv="refresh" content="30" />{% endblock %}
+{% block meta %}
+<meta http-equiv="refresh" content="30" />
+{% endblock %}
 
 {% block content %}
 <table class="table">
@@ -23,7 +25,7 @@
   <tbody>
     {% for team in teams %}
     <tr>
-      <th scope="row">{{ team.place }}</th>
+      <th scope="row">{{ team.rank }}</th>
       <td>{{ team.name }}</td>
       <td>{{ team.school }}</td>
       <td>{{ team.members }}</td>
