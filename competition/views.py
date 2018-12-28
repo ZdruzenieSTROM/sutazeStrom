@@ -59,13 +59,10 @@ class SubmitFormView(SingleObjectFormView):
 
     form_class = SubmitForm
 
-    object_field_name = 'competition'
+    object_field_name = 'event'
 
     def get_success_url(self):
         return reverse('competition:submit', kwargs={'pk': self.kwargs['pk']})
-
-    def get_initial(self):
-        return {'event': self.object}
 
     def get_context_data(self, **kwargs):
         context = super(SubmitFormView, self).get_context_data(**kwargs)
@@ -171,11 +168,7 @@ def generate_results(event):
 
     comp = itemgetter('points', 'problem_points')
 
-    teams = sorted(
-        teams,
-        key=comp,
-        reverse=True
-    )
+    teams = sorted(teams, key=comp, reverse=True)
 
     place = 1
 
