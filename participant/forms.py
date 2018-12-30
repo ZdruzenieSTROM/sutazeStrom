@@ -5,7 +5,8 @@ from django.conf import settings
 from pandas import read_csv
 
 from competition.models import Event
-from .models import *
+
+from .models import Compensation, Participant, Team
 
 CSV_FIELDS = [
     'tim',
@@ -104,29 +105,38 @@ class ImportForm(forms.Form):
                 raise forms.ValidationError('Vyber si len jeden zdroj údajov!')
 
             if csv_file:
-                self.cleaned_data['dataframe'] = read_csv(
+                dataframe = read_csv(
                     csv_file,
                     names=CSV_FIELDS,
                     delimiter=settings.CSV_DELIMITER,
                     encoding=settings.CSV_ENCODING,
                 )
             else:
-                self.cleaned_data['dataframe'] = read_csv(
+                dataframe = read_csv(
                     StringIO(csv_text),
                     names=CSV_FIELDS,
                     delimiter=settings.CSV_DELIMITER,
                 )
 
+            teams = Team.objects.filter(event=event).order_by('-number')
+            smallest_team_number = teams.first().number if teams.exists() else 0
+            teams_to_import = len(dataframe['tim']) - 1
+
+            if smallest_team_number + teams_to_import > 999:
+                raise forms.ValidationError(
+                    'Novým tímom sa nepodarilo prideliť čísla!')
+
+            cleaned_data['dataframe'] = dataframe
+            cleaned_data['smallest_team_number'] = smallest_team_number
+
         return cleaned_data
 
     def save(self):
-        def next_team_number():
-            return Team.objects.order_by('number').first().number + 1
-
         event = self.cleaned_data['event']
         teams = self.cleaned_data['dataframe']['tim']
         schools = self.cleaned_data['dataframe']['skola']
         participants = self.cleaned_data['dataframe']['pocet_clenov']
+        smallest_team_number = self.cleaned_data['smallest_team_number']
 
         u1_names = self.cleaned_data['dataframe']['ucastnik1_meno']
         u1_surnames = self.cleaned_data['dataframe']['ucastnik1_priezvisko']
@@ -144,40 +154,24 @@ class ImportForm(forms.Form):
         u4_surnames = self.cleaned_data['dataframe']['ucastnik1_priezvisko']
         u4_classes = self.cleaned_data['dataframe']['ucastnik1_rocnik']
 
-        k = len(teams) + 1
         participant_data = [
-            [
-                u1_names,
-                u1_surnames,
-                u1_classes
-            ],
-            [
-                u2_names,
-                u2_surnames,
-                u2_classes
-            ],
-            [
-                u3_names,
-                u3_surnames,
-                u3_classes
-            ],
-            [
-                u4_names,
-                u4_surnames,
-                u4_classes
-            ]
+            [u1_names, u1_surnames, u1_classes],
+            [u2_names, u2_surnames, u2_classes],
+            [u3_names, u3_surnames, u3_classes],
+            [u4_names, u4_surnames, u4_classes],
         ]
 
-        for i in range(1, k):
+        for i, _ in enumerate(teams[1:], 1):
             team = Team.objects.create(
                 name=teams[i],
-                number=next_team_number(),
+                number=smallest_team_number + i,
                 school=schools[i],
                 event=event
             )
 
             for j in range(int(participants[i])):
                 school_class = ROCNIKY[participant_data[j][2][i]]
+
                 compensation = Compensation.objects.get(
                     event=event,
                     school_class=school_class,
