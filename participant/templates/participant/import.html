@@ -17,19 +17,19 @@
   {% endfor %}
 
   {% for field in form%}
-    {% for error in field.errors %}
-    <div class="alert alert-dismissible alert-danger">
-      {{ error }}
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    {% endfor %}
+  {% for error in field.errors %}
+  <div class="alert alert-dismissible alert-danger">
+    {{ error }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
   {% endfor %}
 
   <div class="form-group">
     {% for field in form %}
-    <p>{{ field.label_tag }} {{ field }}</p>
+    <div class="form-group">{{ field.label_tag }} {{ field }}</div>
     {% endfor %}
   </div>
 

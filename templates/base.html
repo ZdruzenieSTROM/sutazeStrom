@@ -32,8 +32,7 @@
         </div>
     </nav>
 
-    <div class="container-fluid" style="padding-top:16px;">
-
+    <div class="container-fluid" style="padding:15px;">
         {% for message in messages %}
         <div class="alert alert-dismissible {% if message.tags %}alert-{{ message.tags }}{% endif %}">
             {{ message }}

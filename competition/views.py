@@ -123,7 +123,7 @@ class CSVResultsView(View, SingleObjectMixin):
         writer = csv.writer(response, delimiter=settings.CSV_DELIMITER)
 
         for team in teams:
-            row = [team['place'], team['name'], team['school'],
+            row = [team['rank'], team['name'], team['school'],
                    team['members'], team['compensation']]
             row.extend([category['count'] for category in team['categories']])
             row.extend([team['problem_points'], team['points']])
@@ -180,6 +180,7 @@ def generate_results(event):
         if comp(teams[i]) != comp(teams[i+1]):
             rank += 1
 
-    teams[-1]['rank'] = rank
+    if teams:
+        teams[-1]['rank'] = rank
 
     return (categories, teams)
