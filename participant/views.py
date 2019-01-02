@@ -20,12 +20,12 @@ class ImportFormView(FormView):
         return reverse('participant:import')
 
     def form_valid(self, form):
-        imported = form.save()
+        saved = form.save()
 
         messages.success(
             self.request,
             'Údaje boli úspešne importované. Počet tímov: {}, počet účastníkov: {}'.format(
-                imported['saved_teams'], imported['saved_participants'])
+                saved['teams'], saved['participants'])
         )
 
         return super(ImportFormView, self).form_valid(form)

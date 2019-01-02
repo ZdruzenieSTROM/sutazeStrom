@@ -1,4 +1,5 @@
 import os
+
 from django.contrib import messages
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -126,6 +127,52 @@ STATICFILES_DIRS = [
 CSV_DELIMITER = ';'
 
 CSV_ENCODING = 'utf8'
+
+LOMIHLAV_CSV_FIELDS = [
+    'tim', 'skola', 'ico', 'pocet_clenov',
+    'kontakt_meno', 'kontakt_email', 'kontakt_tel',
+    'ucastnik1_meno', 'ucastnik1_priezvisko', 'ucastnik1_rocnik',
+    'ucastnik1_email', 'ucastnik1_a1', 'ucastnik1_a2', 'ucastnik1_a3',
+    'ucastnik2_meno', 'ucastnik2_priezvisko', 'ucastnik2_rocnik',
+    'ucastnik2_email', 'ucastnik2_a1', 'ucastnik2_a2', 'ucastnik2_a3',
+    'ucastnik3_meno', 'ucastnik3_priezvisko', 'ucastnik3_rocnik',
+    'ucastnik3_email', 'ucastnik3_a1', 'ucastnik3_a2', 'ucastnik3_a3',
+    'ucastnik4_meno', 'ucastnik4_priezvisko', 'ucastnik4_rocnik',
+    'ucastnik4_email', 'ucastnik4_a1', 'ucastnik4_a2', 'ucastnik4_a3',
+    'cislo_timu',
+]
+
+LOMIHLAV_SCHOOL_CLASS_MAPPER = {
+    'siedmy': 7,
+    'sekunda': 7,
+    'ôsmy': 8,
+    'tercia': 8,
+    'deviaty': 9,
+    'kvarta': 9,
+}
+
+MAMUT_CSV_FIELDS = [
+    'tim', 'skola', 'ico', 'pocet_clenov',
+    'kontakt_meno', 'kontakt_email', 'kontakt_tel',
+    'ucastnik1_meno', 'ucastnik1_priezvisko', 'ucastnik1_rocnik',
+    'ucastnik1_email', 'ucastnik1_a1', 'ucastnik1_a2', 'ucastnik1_a3',
+    'ucastnik2_meno', 'ucastnik2_priezvisko', 'ucastnik2_rocnik',
+    'ucastnik2_email', 'ucastnik2_a1', 'ucastnik2_a2', 'ucastnik2_a3',
+    'ucastnik3_meno', 'ucastnik3_priezvisko', 'ucastnik3_rocnik',
+    'ucastnik3_email', 'ucastnik3_a1', 'ucastnik3_a2', 'ucastnik3_a3',
+    'ucastnik4_meno', 'ucastnik4_priezvisko', 'ucastnik4_rocnik',
+    'ucastnik4_email', 'ucastnik4_a1', 'ucastnik4_a2', 'ucastnik4_a3',
+    'ucastnik5_meno', 'ucastnik5_priezvisko', 'ucastnik5_rocnik',
+    'ucastnik5_email', 'ucastnik5_a1', 'ucastnik5_a2', 'ucastnik5_a3',
+    'cislo_timu',
+]
+
+MAMUT_SCHOOL_CLASS_MAPPER = {
+    'štvrtý': 4,
+    'piaty': 5,
+    'šiesty': 6,
+    'príma': 6,
+}
 
 
 # Messages

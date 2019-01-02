@@ -29,7 +29,7 @@
 
   <div class="form-group">
     {% for field in form %}
-    <div class="form-group">{{ field.label_tag }} {{ field }}</div>
+    <p>{% if field.label %}{{ field.label_tag }}{% endif %} {{ field }}</p>
     {% endfor %}
   </div>
 
