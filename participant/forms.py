@@ -16,12 +16,17 @@ class ImportForm(forms.Form):
     csv_text = forms.CharField(widget=forms.Textarea, required=False, label='')
     csv_file = forms.FileField(required=False, label='')
 
+    ignore_first_entry = forms.BooleanField(
+        required=False, label='Ignorovať prvý záznam')
+
     def __init__(self, *args, **kwargs):
         super(ImportForm, self).__init__(*args, **kwargs)
         self.fields['csv_text'].widget.attrs.update({'class': 'form-control'})
         self.fields['csv_file'].widget.attrs.update(
             {'class': 'form-control-file'})
         self.fields['event'].widget.attrs.update({'class': 'form-event'})
+        self.fields['ignore_first_entry'].widget.attrs.update(
+            {'class': 'form-check-input'})
 
     def clean_csv_file(self):
         csv_file = self.cleaned_data['csv_file']
@@ -39,8 +44,8 @@ class ImportForm(forms.Form):
             return cleaned_data
 
         event = cleaned_data['event']
-
         csv_file, csv_text = cleaned_data['csv_file'], cleaned_data['csv_text']
+        ignore_first_entry = cleaned_data['ignore_first_entry']
 
         if not (csv_file or csv_text):
             raise forms.ValidationError(
@@ -49,10 +54,15 @@ class ImportForm(forms.Form):
         if csv_file and csv_text:
             raise forms.ValidationError('Vyber si len jeden zdroj údajov!')
 
+        # TODO: choose fields and mapper based on competition type
+
+        fields = settings.MAMUT_CSV_FIELDS
+        mapper = settings.MAMUT_SCHOOL_CLASS_MAPPER
+
         if csv_file:
             dataframe = read_csv(
                 csv_file,
-                names=settings.MAMUT_CSV_FIELDS,
+                names=fields,
                 delimiter=settings.CSV_DELIMITER,
                 encoding=settings.CSV_ENCODING,
             )
@@ -60,112 +70,76 @@ class ImportForm(forms.Form):
         else:
             dataframe = read_csv(
                 StringIO(csv_text),
-                names=settings.MAMUT_CSV_FIELDS,
+                names=fields,
                 delimiter=settings.CSV_DELIMITER,
             )
 
-        teams_to_import = dataframe['tim']
-        schools_to_import = dataframe['skola']
-        participant_counts = dataframe['pocet_clenov']
+        if ignore_first_entry:
+            dataframe.drop(dataframe.index[0], inplace=True)
 
-        try:
-            participants_to_import = [
-                {
-                    'first_names': dataframe['ucastnik{}_meno'.format(i)],
-                    'last_names': dataframe['ucastnik{}_priezvisko'.format(i)],
-                    'school_classes': dataframe['ucastnik{}_rocnik'.format(i)]
-                } for i in range(1, event.team_members + 1)
-            ]
-
-        except KeyError:
-            raise forms.ValidationError(
-                'Niektorý zo záznamov nemá dostatočný počet stĺpcov s účastníkmi!')
-
-        available_team_numbers = self.find_available_team_numbers(
-            event, len(teams_to_import) - 1)
+        available_numbers = find_available_team_numbers(event, len(dataframe))
 
         # In case there's not enough available numbers
-        if len(available_team_numbers) < len(teams_to_import) - 1:
+        if len(available_numbers) < len(dataframe):
             raise forms.ValidationError(
                 'Novým tímom sa nepodarilo prideliť čísla!')
 
         teams_to_save, participants_to_save = [], []
 
-        for i, _ in enumerate(teams_to_import[1:], 1):
+        for i, row in dataframe.iterrows():
+            if ignore_first_entry:
+                i -= 1
+
             team = Team(
-                name=teams_to_import[i],
-                number=available_team_numbers[i-1],
-                school=schools_to_import[i],
+                name=row['team'],
+                number=available_numbers[i],
+                school=row['school'],
                 event=event
             )
 
             teams_to_save.append(team)
 
-            if int(participant_counts[i]) > event.team_members:
+            if int(row['members']) > event.team_members:
                 raise forms.ValidationError(
-                    'Neplatné údaje, tím {} má viac tímov ako je povolené! (záznam {})'.format(
+                    'Neplatné údaje, tím {} má viac účastníkov ako je povolené! (záznam {})'.format(
                         team.name, i))
 
             participants_to_save.append([])
 
-            for j in range(int(participant_counts[i])):
+            for j in range(int(row['members'])):
+                prefix = 'participant{}'.format(j)
+
+                first_name = row['{}_first_name'.format(prefix)]
+                last_name = row['{}_last_name'.format(prefix)]
+
                 try:
-                    school_class = settings.MAMUT_SCHOOL_CLASS_MAPPER[participants_to_import[j]
-                                                                      ['school_classes'][i]]
+                    school_class = mapper[
+                        row['{}_school_class'.format(prefix)]]
+
+                    compensation = Compensation.objects.get(
+                        event=event, school_class=school_class)
 
                 except KeyError:
                     raise forms.ValidationError(
                         'Účastník {} {} zo školy {} má neplatný ročník! (záznam {})'.format(
-                            participants_to_import[j]['first_names'][i],
-                            participants_to_import[j]['last_names'][i],
-                            schools_to_import[i], i
-                        ))
-
-                try:
-                    compensation = Compensation.objects.get(
-                        event=event, school_class=school_class)
+                            row['participant{}_first_name'.format(j)],
+                            row['participant{}_last_name'.format(j)],
+                            row['school'], i))
 
                 except Compensation.DoesNotExist:
                     raise forms.ValidationError(
                         'Pre ročník {} ({}) nebola nájdená bonifikácia! (záznam {})'.format(
-                            participants_to_import[j]['school_classes'][i], school_class, i))
+                            row['{}_school_class'].format(prefix), school_class, i))
 
-                participants_to_save[i-1].append(Participant(
-                    first_name=participants_to_import[j]['first_names'][i],
-                    last_name=participants_to_import[j]['last_names'][i],
-                    compensation=compensation
-                ))
+                participants_to_save[i].append(Participant(
+                    first_name=first_name,
+                    last_name=last_name,
+                    compensation=compensation))
 
         cleaned_data['teams_to_save'] = teams_to_save
         cleaned_data['participants_to_save'] = participants_to_save
 
         return cleaned_data
-
-    def find_available_team_numbers(self, event, required):
-        teams_in_database = Team.objects.filter(event=event).order_by('number')
-        available_team_numbers = []
-        pivot = 100
-
-        # Look for numbers in between already assigned team numbers
-        for team in teams_in_database:
-            while pivot != team.number:
-                available_team_numbers.append(pivot)
-                pivot += 1
-
-                if len(available_team_numbers) >= required:
-                    break
-
-            pivot += 1
-
-        # Look for numbers greater than already assigned numbers
-        while pivot < 1000:
-            available_team_numbers.append(pivot)
-            pivot += 1
-
-            if len(available_team_numbers) >= required:
-                break
-
-        return available_team_numbers
 
     def save(self):
         teams = self.cleaned_data['teams_to_save']
@@ -179,3 +153,30 @@ class ImportForm(forms.Form):
                 participant.save()
 
         return {'teams': len(teams), 'participants': sum([len(p) for p in participants])}
+
+
+def find_available_team_numbers(event, required):
+    teams_in_database = Team.objects.filter(event=event).order_by('number')
+    available_team_numbers = []
+    pivot = 100
+
+    # Look for numbers in between already assigned team numbers
+    for team in teams_in_database:
+        while pivot != team.number:
+            available_team_numbers.append(pivot)
+            pivot += 1
+
+            if len(available_team_numbers) >= required:
+                break
+
+        pivot += 1
+
+    # Look for numbers greater than already assigned numbers
+    while pivot < 1000:
+        available_team_numbers.append(pivot)
+        pivot += 1
+
+        if len(available_team_numbers) >= required:
+            break
+
+    return available_team_numbers

@@ -129,17 +129,17 @@ CSV_DELIMITER = ';'
 CSV_ENCODING = 'utf8'
 
 LOMIHLAV_CSV_FIELDS = [
-    'tim', 'skola', 'ico', 'pocet_clenov',
-    'kontakt_meno', 'kontakt_email', 'kontakt_tel',
-    'ucastnik1_meno', 'ucastnik1_priezvisko', 'ucastnik1_rocnik',
-    'ucastnik1_email', 'ucastnik1_a1', 'ucastnik1_a2', 'ucastnik1_a3',
-    'ucastnik2_meno', 'ucastnik2_priezvisko', 'ucastnik2_rocnik',
-    'ucastnik2_email', 'ucastnik2_a1', 'ucastnik2_a2', 'ucastnik2_a3',
-    'ucastnik3_meno', 'ucastnik3_priezvisko', 'ucastnik3_rocnik',
-    'ucastnik3_email', 'ucastnik3_a1', 'ucastnik3_a2', 'ucastnik3_a3',
-    'ucastnik4_meno', 'ucastnik4_priezvisko', 'ucastnik4_rocnik',
-    'ucastnik4_email', 'ucastnik4_a1', 'ucastnik4_a2', 'ucastnik4_a3',
-    'cislo_timu',
+    'team', 'school', 'team_ign1', 'members',
+    'team_ign2', 'team_ign3', 'team_ign4',
+    'participant0_first_name', 'participant0_last_name', 'participant0_school_class',
+    'participant0_ign1', 'participant0_ign2', 'participant0_ign3', 'participant0_ign4',
+    'participant1_first_name', 'participant1_last_name', 'participant1_school_class',
+    'participant1_ign1', 'participant1_ign2', 'participant1_ign3', 'participant1_ign4',
+    'participant2_first_name', 'participant2_last_name', 'participant2_school_class',
+    'participant2_ign1', 'participant2_ign2', 'participant2_ign3', 'participant2_ign4',
+    'participant3_first_name', 'participant3_last_name', 'participant3_school_class',
+    'participant3_ign1', 'participant3_ign2', 'participant3_ign3', 'participant3_ign4',
+    'team_ign5',
 ]
 
 LOMIHLAV_SCHOOL_CLASS_MAPPER = {
@@ -152,19 +152,19 @@ LOMIHLAV_SCHOOL_CLASS_MAPPER = {
 }
 
 MAMUT_CSV_FIELDS = [
-    'tim', 'skola', 'ico', 'pocet_clenov',
-    'kontakt_meno', 'kontakt_email', 'kontakt_tel',
-    'ucastnik1_meno', 'ucastnik1_priezvisko', 'ucastnik1_rocnik',
-    'ucastnik1_email', 'ucastnik1_a1', 'ucastnik1_a2', 'ucastnik1_a3',
-    'ucastnik2_meno', 'ucastnik2_priezvisko', 'ucastnik2_rocnik',
-    'ucastnik2_email', 'ucastnik2_a1', 'ucastnik2_a2', 'ucastnik2_a3',
-    'ucastnik3_meno', 'ucastnik3_priezvisko', 'ucastnik3_rocnik',
-    'ucastnik3_email', 'ucastnik3_a1', 'ucastnik3_a2', 'ucastnik3_a3',
-    'ucastnik4_meno', 'ucastnik4_priezvisko', 'ucastnik4_rocnik',
-    'ucastnik4_email', 'ucastnik4_a1', 'ucastnik4_a2', 'ucastnik4_a3',
-    'ucastnik5_meno', 'ucastnik5_priezvisko', 'ucastnik5_rocnik',
-    'ucastnik5_email', 'ucastnik5_a1', 'ucastnik5_a2', 'ucastnik5_a3',
-    'cislo_timu',
+    'team', 'school', 'team_ign1', 'members',
+    'team_ign2', 'team_ign3', 'team_ign4',
+    'participant0_first_name', 'participant0_last_name', 'participant0_school_class',
+    'participant0_ign1', 'participant0_ign2', 'participant0_ign3', 'participant0_ign4',
+    'participant1_first_name', 'participant1_last_name', 'participant1_school_class',
+    'participant1_ign1', 'participant1_ign2', 'participant1_ign3', 'participant1_ign4',
+    'participant2_first_name', 'participant2_last_name', 'participant2_school_class',
+    'participant2_ign1', 'participant2_ign2', 'participant2_ign3', 'participant2_ign4',
+    'participant3_first_name', 'participant3_last_name', 'participant3_school_class',
+    'participant3_ign1', 'participant3_ign2', 'participant3_ign3', 'participant3_ign4',
+    'participant4_first_name', 'participant4_last_name', 'participant4_school_class',
+    'participant4_ign1', 'participant4_ign2', 'participant4_ign3', 'participant4_ign4',
+    'team_ign5',
 ]
 
 MAMUT_SCHOOL_CLASS_MAPPER = {

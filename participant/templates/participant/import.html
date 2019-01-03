@@ -28,9 +28,13 @@
   {% endfor %}
 
   <div class="form-group">
-    {% for field in form %}
-    <p>{% if field.label %}{{ field.label_tag }}{% endif %} {{ field }}</p>
-    {% endfor %}
+    <p>{{ form.event.label_tag }} {{ form.event }}</p>
+    <p>{{ form.csv_text }}</p>
+    <p>{{ form.csv_file }}</p>
+    <div class="form-check">
+      {{ form.ignore_first_entry }}
+      <label for="{{ form.ignore_first_entry.id }}" class="form-check-label">{{ form.ignore_first_entry.label }}</label>
+    </div>
   </div>
 
   <input type="submit" class="btn btn-primary" value="Nahraj" />

@@ -138,6 +138,7 @@ def generate_results(event):
         event=event).order_by('position')
 
     # Pull information about teams from database
+    # TODO: use annotate instead of pulling data into a dictionary
     teams = [
         {
             'name': team.name,
