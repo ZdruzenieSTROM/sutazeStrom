@@ -116,7 +116,7 @@ class InitializeMamutForm(forms.Form):
                 points=category_description['points']
             )
 
-            for j in range(1, category_description['count']):
+            for j in range(1, category_description['count'] + 1):
                 Problem.objects.create(position=j, category=category)
 
         for compensation_description in settings.MAMUT_COMPENSATIONS:

@@ -135,9 +135,16 @@ class CSVResultsView(View, SingleObjectMixin):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="export.csv"'
 
-        _, teams = generate_results(self.object)
+        categories, teams = generate_results(self.object)
 
         writer = csv.writer(response, delimiter=settings.CSV_DELIMITER)
+
+        heading = ['Poradie', 'Názov tímu',
+                   'Škola', 'Účastníci', 'Bonifikácia']
+        heading.extend([category.name for category in categories])
+        heading.extend(['Príklady', 'Spolu'])
+
+        writer.writerow(heading)
 
         for team in teams:
             row = [team['rank'], team['name'], team['school'],
