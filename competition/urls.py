@@ -2,7 +2,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.urls import path
 
 from .views import (CSVResultsView, EventDetailView, EventListView,
-                    ResultsView, SubmitFormView)
+                    InitializeMamutView, ResultsView, SubmitFormView)
 
 app_name = 'competition'
 
@@ -15,4 +15,6 @@ urlpatterns = [
          staff_member_required(ResultsView.as_view()), name='results'),
     path('<int:pk>/csvresults/',
          staff_member_required(CSVResultsView.as_view()), name='csv_results'),
+    path('initialize_mamut', staff_member_required(
+        InitializeMamutView.as_view()), name='initialize_mamut')
 ]

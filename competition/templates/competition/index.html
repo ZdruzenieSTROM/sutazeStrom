@@ -8,9 +8,9 @@
 <div class="list-group">
   {% for event in events %}
   <a class="list-group-item list-group-item-action" href="{% url 'competition:event' event.pk %}">{{ event }}</a>
-  {% empty %}
-  <a class="list-group-item list-group-item-action" href="{% url 'admin:index' %}">Vytvoriť udalosť</a>
   {% endfor %}
+  <a class="list-group-item list-group-item-action" href="{% url 'competition:initialize_mamut' %}">Vytvoriť Mamut</a>
+  <a class="list-group-item list-group-item-action" href="#">Vytvoriť Lomihlav</a>
 </div>
 
 <br />

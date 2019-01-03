@@ -11,7 +11,7 @@ from django.views.generic.detail import SingleObjectMixin
 
 from participant.models import Team
 
-from .forms import SubmitForm
+from .forms import InitializeMamutForm, SubmitForm
 from .models import Event, ProblemCategory, Solution
 
 
@@ -27,6 +27,23 @@ class EventDetailView(DetailView):
     context_object_name = 'event'
 
     template_name = 'competition/event.html'
+
+
+class InitializeMamutView(FormView):
+    template_name = 'competition/initialize_mamut.html'
+
+    form_class = InitializeMamutForm
+
+    def get_success_url(self):
+        return reverse('competition:index')
+
+    def form_valid(self, form):
+        event = form.save()
+
+        messages.success(
+            self.request, '{} bol úspešne vytvorený!'.format(event))
+
+        return super(InitializeMamutView, self).form_valid(form)
 
 
 class SingleObjectFormView(FormView, SingleObjectMixin):

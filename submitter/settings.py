@@ -174,6 +174,20 @@ MAMUT_SCHOOL_CLASS_MAPPER = {
     'príma': 6,
 }
 
+MAMUT_PROBLEM_CATEGORIES = [
+    {'name': 'Ľahké', 'points': 1, 'count': 25},
+    {'name': 'Stredné', 'points': 3, 'count': 20},
+    {'name': 'Ťažké', 'points': 5, 'count': 10},
+]
+
+MAMUT_COMPENSATIONS = [
+    {'class': 4, 'points': 5},
+    {'class': 5, 'points': 3},
+    {'class': 6, 'points': 1},
+]
+
+MAMUT_TEAM_MEMBERS = 5
+
 
 # Messages
 

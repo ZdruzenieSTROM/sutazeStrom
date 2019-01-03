@@ -1,10 +1,11 @@
 from functools import reduce
 
 from django import forms
+from django.conf import settings
 
-from participant.models import Team
+from participant.models import Compensation, Team
 
-from .models import Event, Problem, Solution
+from .models import Event, Problem, ProblemCategory, Solution
 
 CONTROL = [5, 1, 9, 3, 7]
 
@@ -88,3 +89,41 @@ class SubmitForm(forms.Form):
         )
 
         return solution
+
+
+class InitializeMamutForm(forms.Form):
+    date = forms.DateField(label='Dátum konania',
+                           help_text='Formát: rrrr-mm-dd')
+
+    def __init__(self, *args, **kwargs):
+        super(InitializeMamutForm, self).__init__(*args, **kwargs)
+        self.fields['date'].widget.attrs.update({'class': 'form-control'})
+
+    def save(self):
+        date = self.cleaned_data['date']
+
+        event = Event.objects.create(
+            name='Mamut',
+            date=date,
+            team_members=settings.MAMUT_TEAM_MEMBERS
+        )
+
+        for i, category_description in enumerate(settings.MAMUT_PROBLEM_CATEGORIES):
+            category = ProblemCategory.objects.create(
+                name=category_description['name'],
+                event=event,
+                position=i,
+                points=category_description['points']
+            )
+
+            for j in range(1, category_description['count']):
+                Problem.objects.create(position=j, category=category)
+
+        for compensation_description in settings.MAMUT_COMPENSATIONS:
+            Compensation.objects.create(
+                event=event,
+                points=compensation_description['points'],
+                school_class=compensation_description['class']
+            )
+
+        return event

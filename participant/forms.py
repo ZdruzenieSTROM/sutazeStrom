@@ -99,14 +99,21 @@ class ImportForm(forms.Form):
 
             teams_to_save.append(team)
 
-            if int(row['members']) > event.team_members:
+            try:
+                members = int(row['members'])
+
+            except ValueError:
+                raise forms.ValidationError(
+                    'Počet členov v zázname {} nie je platné číslo'.format(i))
+
+            if members > event.team_members:
                 raise forms.ValidationError(
                     'Neplatné údaje, tím {} má viac účastníkov ako je povolené! (záznam {})'.format(
                         team.name, i))
 
             participants_to_save.append([])
 
-            for j in range(int(row['members'])):
+            for j in range(members):
                 prefix = 'participant{}'.format(j)
 
                 first_name = row['{}_first_name'.format(prefix)]
