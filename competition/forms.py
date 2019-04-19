@@ -45,10 +45,19 @@ class SubmitForm(forms.Form):
 
             number, position = code // 100, code % 100
 
+            categories = ProblemCategory.objects.filter(event=event).order_by("position")
+            pcategory = None
+
+            for category in categories:
+                if position > category.problem_set.count():
+                    position -= category.problem_set.count()
+                else:
+                    pcategory = category
+
             try:
                 team = Team.objects.get(event=event, number=number)
                 problem = Problem.objects.get(
-                    category__event=event, position=position)
+                    category__event=event, position=position, category=pcategory)
 
             except Team.DoesNotExist:
                 raise forms.ValidationError(
