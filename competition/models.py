@@ -39,9 +39,10 @@ class Solution(models.Model):
     time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return '{}, {}, úloha {}, {}'.format(
+        return '{}, {}, úloha {} - {}, {}'.format(
             self.team.event,
             self.team.name,
+            self.problem.category.name,
             self.problem.position,
             self.time
         )

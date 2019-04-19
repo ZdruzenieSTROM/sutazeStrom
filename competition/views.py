@@ -94,7 +94,8 @@ class SubmitFormView(SingleObjectFormView):
 
         messages.success(
             self.request,
-            'Úloha {} bola úspešne odovzdaná tímom {} zo školy {}.'.format(
+            'Úloha {} {} bola úspešne odovzdaná tímom {} zo školy {}.'.format(
+                solution.problem.category.name.lower(),
                 solution.problem.position,
                 solution.team.name,
                 solution.team.school
