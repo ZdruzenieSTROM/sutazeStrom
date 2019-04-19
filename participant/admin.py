@@ -44,6 +44,7 @@ class ParticipantAdmin(admin.ModelAdmin):
     ]
     ordering = ('last_name', 'first_name', '-pk')
 
+
 admin.site.register(Compensation)
 admin.site.register(Participant, ParticipantAdmin)
 admin.site.register(Team, TeamAdmin)

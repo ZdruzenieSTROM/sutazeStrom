@@ -43,34 +43,31 @@ class SubmitForm(forms.Form):
             code = cleaned_data['code']
             event = cleaned_data['event']
 
-            number, position = code // 100, code % 100
+            number, code_position = code // 100, code % 100
+            position = code_position
 
-            categories = ProblemCategory.objects.filter(event=event).order_by("position")
-            pcategory = None
+            categories = ProblemCategory.objects.filter(
+                event=event).order_by("position")
 
             for category in categories:
                 if position > category.problem_set.count():
                     position -= category.problem_set.count()
                 else:
-                    pcategory = category
+                    problem = Problem.objects.get(
+                        position=position, category=category)
                     break
+
+            else:
+                raise forms.ValidationError(
+                    'Úloha s číslom {} v tejto súťaže neexistuje!'.format(code_position))
 
             try:
                 team = Team.objects.get(event=event, number=number)
-                problem = Problem.objects.get(
-                    category__event=event, position=position, category=pcategory)
 
             except Team.DoesNotExist:
                 raise forms.ValidationError(
                     'Číslo tímu {} nezodpovedá registrovanému tímu!'.format(
-                        number)
-                )
-
-            except Problem.DoesNotExist:
-                raise forms.ValidationError(
-                    'Úloha číslo {} v tejto súťaži neexistuje!'.format(
-                        position)
-                )
+                        number))
 
             else:
                 self.cleaned_data['team'] = team
@@ -85,10 +82,7 @@ class SubmitForm(forms.Form):
                 else:
                     raise forms.ValidationError(
                         'Táto úloha už bola odovzdaná v čase {}! ({})'.format(
-                            solution.time.strftime('%H:%M:%S (%d. %m. %Y)'),
-                            code
-                        )
-                    )
+                            solution.time.strftime('%H:%M:%S (%d. %m. %Y)'), code))
 
         return cleaned_data
 
