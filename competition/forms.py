@@ -53,6 +53,7 @@ class SubmitForm(forms.Form):
                     position -= category.problem_set.count()
                 else:
                     pcategory = category
+                    break
 
             try:
                 team = Team.objects.get(event=event, number=number)
