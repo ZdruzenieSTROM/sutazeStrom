@@ -198,15 +198,31 @@ def generate_results(event):
     teams.sort(key=comp, reverse=True)
 
     # Generate ranks
-    rank = 1
+    def save_team_ranks(teams, lower_rank):
+        upper_rank = lower_rank + len(teams) - 1
 
-    for i, _ in enumerate(teams[:-1]):
-        teams[i]['rank'] = rank
+        if len(teams) == 1:
+            teams[0]['rank'] = lower_rank
 
-        if comp(teams[i]) != comp(teams[i+1]):
-            rank += 1
+        else:
+            for team_to_rank in teams:
+                team_to_rank['rank'] = "{} - {}".format(lower_rank, upper_rank)
 
-    if teams:
-        teams[-1]['rank'] = rank
+        return upper_rank
+
+    lower_rank = 1
+    identically_ranked_teams = []
+
+    for team in teams:
+        if not identically_ranked_teams or comp(team) == comp(identically_ranked_teams[-1]):
+            identically_ranked_teams.append(team)
+        else:
+            lower_rank = save_team_ranks(
+                identically_ranked_teams, lower_rank) + 1
+
+            identically_ranked_teams.clear()
+            identically_ranked_teams.append(team)
+
+    save_team_ranks(identically_ranked_teams, lower_rank)
 
     return (categories, teams)
