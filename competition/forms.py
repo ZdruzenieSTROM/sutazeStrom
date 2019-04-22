@@ -59,7 +59,7 @@ class SubmitForm(forms.Form):
 
             else:
                 raise forms.ValidationError(
-                    'Úloha s číslom {} v tejto súťaže neexistuje!'.format(code_position))
+                    'Úloha s číslom {} v tejto súťaži neexistuje!'.format(code_position))
 
             try:
                 team = Team.objects.get(event=event, number=number)

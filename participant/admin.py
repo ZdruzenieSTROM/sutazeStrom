@@ -20,7 +20,7 @@ class ParticipantInline(admin.TabularInline):
 
 
 class TeamAdmin(admin.ModelAdmin):
-    list_display = ('name', 'school', 'event')
+    list_display = ('name', 'number', 'school', 'event')
     readonly_fields = ('number',)
     list_filter = ('event',)
     list_per_page = 100
@@ -30,6 +30,7 @@ class TeamAdmin(admin.ModelAdmin):
     search_fields = [
         'name',
         'school',
+        'number',
     ]
     ordering = ('number', '-pk')
 
