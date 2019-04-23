@@ -1,9 +1,6 @@
-import os
-
-from django.conf import settings
 from django.contrib import messages
 from django.core import management
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse
 from django.shortcuts import reverse
 from django.views import View
 from django.views.generic.edit import FormView
@@ -33,13 +30,9 @@ class ImportFormView(FormView):
 
 class ExportView(View):
     def get(self, request):
-        file_name = 'db' + '.json'
-        management.call_command('dumpdata', format='json', output=file_name)
-        file_path = os.path.join(settings.BASE_DIR, file_name)
+        filename = 'db.json'
+        management.call_command('dumpdata', format='json', output=filename)
 
-        json_file = open(file_path, 'rb')
+        json_file = open(filename, 'rb')
 
-        if not os.path.exists(file_path):
-            return HttpResponse(status=500)
-
-        return FileResponse(json_file, as_attachment=True, filename=file_name)
+        return FileResponse(json_file, as_attachment=True, filename=filename)
