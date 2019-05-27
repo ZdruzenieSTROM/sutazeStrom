@@ -16,15 +16,15 @@
   {% endfor %}
 
   {% for field in form %}
-    {% for error in field.errors %}
-    <div class="alert alert-dismissible alert-danger">
-      {{ error }} Skús kód naskenovať ešte raz a ak znova uvidíš tento problém, zapíš si čas
-      odovzdania a kontaktuj hlavného IT organizátora.
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    {% endfor %}
+  {% for error in field.errors %}
+  <div class="alert alert-dismissible alert-danger">
+    {{ error }} Skús kód naskenovať ešte raz a ak znova uvidíš tento problém, zapíš si čas
+    odovzdania a kontaktuj hlavného IT organizátora.
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
   {% endfor %}
 
   {{ form.event }}
@@ -32,12 +32,17 @@
   <div class="form-group">
     {{ form.code }}
   </div>
+  <div class="form-group">
+    {{ form.require_control_sum }} <label
+      for="{{ form.require_control_sum.id_for_label }}">{{ form.require_control_sum.label }}</label>
+  </div>
 </form>
 
 {% if solutions %}
 <div class="list-group">
   {% for solution in solutions %}
-  <a class="list-group-item list-group-item-action" target="_blank" href="{% url 'admin:competition_solution_change' solution.pk %}">
+  <a class="list-group-item list-group-item-action" target="_blank"
+    href="{% url 'admin:competition_solution_change' solution.pk %}">
     {{ solution.team }}, úloha <strong>{{ solution.problem.category.name }} {{ solution.problem.position }}</strong>
     <span class="float-right">{{ solution.time|date:"H:i:s (d. m. Y)" }}</span>
   </a>
@@ -48,14 +53,14 @@
 
 {% block javascript %}
 <script>
-    var input = document.getElementById("id_code"),
+  var input = document.getElementById("id_code"),
     focuser = function () {
-        input.focus();
+      input.focus();
     };
 
-    focuser();
-    input.onblur = function () {
-      setTimeout(focuser, 0);
-    };
+  focuser();
+  input.onblur = function () {
+    setTimeout(focuser, 0);
+  };
 </script>
 {% endblock %}

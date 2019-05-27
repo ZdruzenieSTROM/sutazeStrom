@@ -11,6 +11,8 @@ CONTROL = [5, 1, 9, 3, 7]
 
 
 class SubmitForm(forms.Form):
+    require_control_sum = forms.BooleanField(
+        label="Vyžadovať kontrolný súčet", required=False, initial=True)
     event = forms.ModelChoiceField(
         Event.objects.all(), widget=forms.HiddenInput())
     code = forms.CharField(max_length=6, label='', required=True)
@@ -20,19 +22,22 @@ class SubmitForm(forms.Form):
         self.fields['code'].widget.attrs.update({'class': 'form-control'})
 
     def clean_code(self):
+        require_control_sum = self.cleaned_data['require_control_sum']
+
         try:
             code = [int(c) for c in self.cleaned_data['code']]
 
         except ValueError:
             raise forms.ValidationError('Nesprávny formát!')
 
-        if len(code) != 6:
+        if (len(code) != 6 and require_control_sum) or (len(code) != 5 and not require_control_sum):
             raise forms.ValidationError('Nesprávna dĺžka kódu!')
 
-        control_digit, code = code[-1], code[:-1]
+        if require_control_sum:
+            control_digit, code = code[-1], code[:-1]
 
-        if control_digit != reduce(lambda p, n: p + n[0]*n[1], zip(code, CONTROL), 0) % 10:
-            raise forms.ValidationError('Neplatný kontrolný súčet!')
+            if control_digit != reduce(lambda p, n: p + n[0]*n[1], zip(code, CONTROL), 0) % 10:
+                raise forms.ValidationError('Neplatný kontrolný súčet!')
 
         return reduce(lambda p, n: p*10 + n, code)
 
