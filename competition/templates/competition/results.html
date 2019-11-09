@@ -18,7 +18,7 @@
       {% for category in categories %}
       <th scope="col">{{ category.name }}</th>
       {% endfor %}
-      <th scope="col">Príklady</th>
+      <th scope="col">Úlohy</th>
       <th scope="col">Spolu</th>
     </tr>
   </thead>
@@ -29,12 +29,12 @@
       <td>{{ team.name }}</td>
       <td>{{ team.school }}</td>
       <td>{{ team.members }}</td>
-      <td>{{ team.compensation }}</td>
+      <td>{{ team.compensation|floatformat:1 }}</td>
       {% for category in team.categories %}
       <td>{{ category.count }}</td>
       {% endfor %}
-      <td>{{ team.problem_points }}</td>
-      <td>{{ team.points }}</td>
+      <td>{{ team.problem_points|floatformat:1 }}</td>
+      <td>{{ team.points|floatformat:1 }}</td>
     </tr>
     {% endfor %}
   </tbody>

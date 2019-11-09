@@ -29,7 +29,7 @@ class Participant(models.Model):
 
 class Compensation(models.Model):
     event = models.ForeignKey('competition.Event', on_delete=models.CASCADE)
-    points = models.SmallIntegerField()
+    points = models.DecimalField(max_digits=6, decimal_places=2)
 
     school_class = models.PositiveSmallIntegerField(
         validators=[

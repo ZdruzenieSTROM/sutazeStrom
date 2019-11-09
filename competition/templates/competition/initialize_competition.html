@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Vytvoriť novú súťaž{% endblock %}
+
+{% block content %}
+<h1>Vytvoriť novú súťaž</h1>
+
+<form action="{% url 'competition:initialize_competition' %}" method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+        {{ form.as_p }}
+    </div>
+    <input class="btn btn-primary" type="submit" value="Vytvoriť" />
+</form>
+{% endblock %}

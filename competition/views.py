@@ -1,4 +1,5 @@
 import csv
+from decimal import Decimal
 from operator import itemgetter
 
 from django.conf import settings
@@ -11,7 +12,7 @@ from django.views.generic.detail import SingleObjectMixin
 
 from participant.models import Team
 
-from .forms import InitializeMamutForm, SubmitForm
+from .forms import InitializeCompetitionForm, SubmitForm
 from .models import Event, ProblemCategory, Solution
 
 
@@ -29,10 +30,10 @@ class EventDetailView(DetailView):
     template_name = 'competition/event.html'
 
 
-class InitializeMamutView(FormView):
-    template_name = 'competition/initialize_mamut.html'
+class InitializeCompetitionView(FormView):
+    template_name = 'competition/initialize_competition.html'
 
-    form_class = InitializeMamutForm
+    form_class = InitializeCompetitionForm
 
     def get_success_url(self):
         return reverse('competition:index')
@@ -43,7 +44,7 @@ class InitializeMamutView(FormView):
         messages.success(
             self.request, '{} bol úspešne vytvorený!'.format(event))
 
-        return super(InitializeMamutView, self).form_valid(form)
+        return super(InitializeCompetitionView, self).form_valid(form)
 
 
 class SingleObjectFormView(FormView, SingleObjectMixin):
@@ -95,12 +96,10 @@ class SubmitFormView(SingleObjectFormView):
         messages.success(
             self.request,
             'Úloha {} {} bola úspešne odovzdaná tímom {} zo školy {}.'.format(
-                solution.problem.category.name.lower(),
-                solution.problem.position,
+                solution.problem_category.name.lower(),
+                solution.problem_position,
                 solution.team.name,
-                solution.team.school
-            )
-        )
+                solution.team.school))
 
         return super(SubmitFormView, self).form_valid(form)
 
@@ -143,7 +142,7 @@ class CSVResultsView(View, SingleObjectMixin):
         heading = ['Poradie', 'Názov tímu',
                    'Škola', 'Účastníci', 'Bonifikácia']
         heading.extend([category.name for category in categories])
-        heading.extend(['Príklady', 'Spolu'])
+        heading.extend(['Úlohy', 'Spolu'])
 
         writer.writerow(heading)
 
@@ -176,26 +175,43 @@ def generate_results(event):
             'categories': [
                 {
                     'points': category.points,
-                    **team.solution_set.aggregate(
-                        count=Count('problem', filter=Q(
-                            problem__category=category))
-                    )
+                    'count': team.solution_set.filter(problem_category=category).count(),
                 } for category in categories
-            ]
+            ],
+            'points': Decimal(0),
+            'problem_points': Decimal(0)
         } for team in Team.objects.filter(event=event)
     ]
 
     # Compute points
+
     for team in teams:
-        team['problem_points'] = sum(
-            [category['points'] * category['count']
-             for category in team['categories']]
-        )
-        team['points'] = team['problem_points'] + team['compensation']
+        for category_stats, category in zip(team['categories'], categories):
+            if category.multiplicative_compensation:
+                category_points = category_stats['count'] * \
+                    category_stats['points']*team['compensation']
+            else:
+                category_points = category_stats['count'] * \
+                    category_stats['points']
+
+            team['points'] += category_points
+
+            if category.is_problem:
+                team['problem_points'] += category_points
+
+        if event.flat_compensation:
+            team['points'] += team['compensation']
+
+    # for team in teams:
+    #     team['problem_points'] = sum(
+    #         [category['points'] * category['count']
+    #          for category in team['categories']]
+    #     )
+    #     team['points'] = team['problem_points'] + team['compensation']
 
     # Sort teams
-    comp = itemgetter('points', 'problem_points')
-    teams.sort(key=comp, reverse=True)
+    team_comparator = itemgetter('points', 'problem_points')
+    teams.sort(key=team_comparator, reverse=True)
 
     # Generate ranks
     def save_team_ranks(teams, lower_rank):
@@ -203,7 +219,6 @@ def generate_results(event):
 
         if len(teams) == 1:
             teams[0]['rank'] = lower_rank
-
         else:
             for team_to_rank in teams:
                 team_to_rank['rank'] = "{} - {}".format(lower_rank, upper_rank)
@@ -214,7 +229,8 @@ def generate_results(event):
     identically_ranked_teams = []
 
     for team in teams:
-        if not identically_ranked_teams or comp(team) == comp(identically_ranked_teams[-1]):
+        if not identically_ranked_teams or\
+                team_comparator(team) == team_comparator(identically_ranked_teams[-1]):
             identically_ranked_teams.append(team)
         else:
             lower_rank = save_team_ranks(

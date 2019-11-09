@@ -1,3 +1,4 @@
+from submitter.competition_settings import *
 import os
 
 from django.contrib import messages
@@ -127,59 +128,6 @@ STATICFILES_DIRS = [
 CSV_DELIMITER = ';'
 
 CSV_ENCODING = 'utf8'
-
-LOMIHLAV_CSV_FIELDS = [
-    'team', 'school', 'team_ign1', 'members',
-    'team_ign2', 'team_ign3', 'team_ign4',
-    'participant0_first_name', 'participant0_last_name', 'participant0_school_class',
-    'participant0_ign1', 'participant0_ign2', 'participant0_ign3', 'participant0_ign4',
-    'participant1_first_name', 'participant1_last_name', 'participant1_school_class',
-    'participant1_ign1', 'participant1_ign2', 'participant1_ign3', 'participant1_ign4',
-    'participant2_first_name', 'participant2_last_name', 'participant2_school_class',
-    'participant2_ign1', 'participant2_ign2', 'participant2_ign3', 'participant2_ign4',
-    'participant3_first_name', 'participant3_last_name', 'participant3_school_class',
-    'participant3_ign1', 'participant3_ign2', 'participant3_ign3', 'participant3_ign4',
-    'team_ign5',
-]
-
-LOMIHLAV_SCHOOL_CLASS_MAPPER = {
-    'siedmy': 7,
-    'sekunda': 7,
-    'ôsmy': 8,
-    'tercia': 8,
-    'deviaty': 9,
-    'kvarta': 9,
-}
-
-MAMUT_CSV_FIELDS = [
-    'team', 'school', 'members',
-    'participant0_first_name', 'participant0_last_name', 'participant0_school_class',
-    'participant1_first_name', 'participant1_last_name', 'participant1_school_class',
-    'participant2_first_name', 'participant2_last_name', 'participant2_school_class',
-    'participant3_first_name', 'participant3_last_name', 'participant3_school_class',
-    'participant4_first_name', 'participant4_last_name', 'participant4_school_class',
-]
-
-MAMUT_SCHOOL_CLASS_MAPPER = {
-    '4. ročník ZŠ': 4,
-    '5. ročník ZŠ': 5,
-    '6. ročník ZŠ/Prima': 6,
-}
-
-MAMUT_PROBLEM_CATEGORIES = [
-    {'name': 'Ľahké', 'points': 1, 'count': 30},
-    {'name': 'Stredné', 'points': 3, 'count': 25},
-    {'name': 'Ťažké', 'points': 5, 'count': 10},
-]
-
-MAMUT_COMPENSATIONS = [
-    {'class': 4, 'points': 5},
-    {'class': 5, 'points': 3},
-    {'class': 6, 'points': 1},
-]
-
-MAMUT_TEAM_MEMBERS = 5
-
 
 # Messages
 

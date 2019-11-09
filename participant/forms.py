@@ -56,8 +56,12 @@ class ImportForm(forms.Form):
 
         # TODO: choose fields and mapper based on competition type
 
-        fields = settings.MAMUT_CSV_FIELDS
-        mapper = settings.MAMUT_SCHOOL_CLASS_MAPPER
+        if 'lomihlav' in event.name.lower():
+            fields = settings.LOMIHLAV_CSV_FIELDS
+            mapper = settings.LOMIHLAV_SCHOOL_CLASS_MAPPER
+        else:
+            fields = settings.MAMUT_CSV_FIELDS
+            mapper = settings.MAMUT_SCHOOL_CLASS_MAPPER
 
         if csv_file:
             dataframe = read_csv(

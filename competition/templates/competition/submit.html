@@ -43,7 +43,7 @@
   {% for solution in solutions %}
   <a class="list-group-item list-group-item-action" target="_blank"
     href="{% url 'admin:competition_solution_change' solution.pk %}">
-    {{ solution.team }}, úloha <strong>{{ solution.problem.category.name }} {{ solution.problem.position }}</strong>
+    {{ solution.team }}, úloha <strong>{{ solution.problem_category.name }} {{ solution.problem_position }}</strong>
     <span class="float-right">{{ solution.time|date:"H:i:s (d. m. Y)" }}</span>
   </a>
   {% endfor %}
