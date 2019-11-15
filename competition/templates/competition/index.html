@@ -9,7 +9,7 @@
   {% for event in events %}
   <a class="list-group-item list-group-item-action" href="{% url 'competition:event' event.pk %}">{{ event }}</a>
   {% endfor %}
-  <a class="list-group-item list-group-item-action" href="{% url 'competition:initialize_competition' %}">Vytvoriť
+  <a class="list-group-item list-group-item-action" href="{% url 'competition:initialize' %}">Vytvoriť
     súťaž</a>
 </div>
 
@@ -18,7 +18,7 @@
 <h1>Účastníci</h1>
 
 <div class="list-group">
-  <a class="list-group-item list-group-item-action" href="{% url 'participant:export' %}">Export</a>
-  <a class="list-group-item list-group-item-action" href="{% url 'participant:import' %}">Import</a>
+  <a class="list-group-item list-group-item-action" href="{% url 'competition:export' %}">Export</a>
+  <a class="list-group-item list-group-item-action" href="{% url 'competition:import' %}">Import</a>
 </div>
 {% endblock %}

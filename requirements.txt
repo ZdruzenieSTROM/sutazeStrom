@@ -1,7 +1,4 @@
 Django==2.2.7
-numpy==1.17.3
-pandas==0.25.3
-python-dateutil==2.8.1
+django-crispy-forms==1.8.0
 pytz==2019.3
-six==1.13.0
 sqlparse==0.3.0

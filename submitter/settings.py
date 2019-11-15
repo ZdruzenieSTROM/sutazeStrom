@@ -1,7 +1,8 @@
-from submitter.competition_settings import *
 import os
 
 from django.contrib import messages
+
+from submitter.event_config import *
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,8 +29,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'crispy_forms',
     'competition.apps.CompetitionConfig',
-    'participant.apps.ParticipantConfig',
 ]
 
 MIDDLEWARE = [
@@ -114,13 +115,8 @@ USE_TZ = True
 
 LOGIN_URL = 'admin:login'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
-
 STATIC_URL = '/static/'
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
 # CSV files
@@ -138,3 +134,7 @@ MESSAGE_TAGS = {
     messages.WARNING: 'warning',
     messages.ERROR: 'danger',
 }
+
+# Crispy forms
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

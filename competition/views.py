@@ -4,47 +4,17 @@ from operator import itemgetter
 
 from django.conf import settings
 from django.contrib import messages
+from django.core import management
 from django.db.models import Count, Q, Sum
-from django.http import HttpResponse
-from django.shortcuts import reverse
+from django.http import FileResponse, HttpResponse
+from django.urls import reverse, reverse_lazy
+from django.views import View
 from django.views.generic import DetailView, FormView, ListView, View
 from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.edit import FormView
 
-from participant.models import Team
-
-from .forms import InitializeCompetitionForm, SubmitForm
-from .models import Event, ProblemCategory, Solution
-
-
-class EventListView(ListView):
-    model = Event
-    context_object_name = 'events'
-
-    template_name = 'competition/index.html'
-
-
-class EventDetailView(DetailView):
-    model = Event
-    context_object_name = 'event'
-
-    template_name = 'competition/event.html'
-
-
-class InitializeCompetitionView(FormView):
-    template_name = 'competition/initialize_competition.html'
-
-    form_class = InitializeCompetitionForm
-
-    def get_success_url(self):
-        return reverse('competition:index')
-
-    def form_valid(self, form):
-        event = form.save()
-
-        messages.success(
-            self.request, '{} bol úspešne vytvorený!'.format(event))
-
-        return super(InitializeCompetitionView, self).form_valid(form)
+from .forms import ImportForm, InitializeForm, SubmitForm
+from .models import Event, ProblemCategory, Solution, Team
 
 
 class SingleObjectFormView(FormView, SingleObjectMixin):
@@ -67,6 +37,34 @@ class SingleObjectFormView(FormView, SingleObjectMixin):
             kwargs['initial'].update({self.object_field_name: self.object})
 
         return kwargs
+
+
+class EventListView(ListView):
+    model = Event
+    context_object_name = 'events'
+
+    template_name = 'competition/index.html'
+
+
+class EventDetailView(DetailView):
+    model = Event
+    context_object_name = 'event'
+
+    template_name = 'competition/event.html'
+
+
+class InitializeView(FormView):
+    template_name = 'competition/initialize.html'
+
+    form_class = InitializeForm
+    success_url = reverse_lazy('competition:index')
+
+    def form_valid(self, form):
+        event = form.save()
+
+        messages.success(self.request, f'{ event } bol úspešne vytvorený!')
+
+        return super(InitializeView, self).form_valid(form)
 
 
 class SubmitFormView(SingleObjectFormView):
@@ -95,11 +93,10 @@ class SubmitFormView(SingleObjectFormView):
 
         messages.success(
             self.request,
-            'Úloha {} {} bola úspešne odovzdaná tímom {} zo školy {}.'.format(
-                solution.problem_category.name.lower(),
-                solution.problem_position,
-                solution.team.name,
-                solution.team.school))
+            f'Úloha { solution.problem_category.name.lower() } '
+            f'{ solution.problem_position } '
+            f'bola úspešne odovzdaná tímom { solution.team.name } '
+            f'zo školy { solution.team.school }.')
 
         return super(SubmitFormView, self).form_valid(form)
 
@@ -157,6 +154,32 @@ class CSVResultsView(View, SingleObjectMixin):
         return response
 
 
+class ImportFormView(FormView):
+    form_class = ImportForm
+
+    template_name = 'competition/import.html'
+
+    def get_success_url(self):
+        return reverse('competition:import')
+
+    def form_valid(self, form):
+        saved = form.save()
+
+        messages.success(
+            self.request,
+            f'Údaje boli úspešne importované. Počet tímov: { saved["teams"] },'
+            f' počet účastníkov: { saved["participants"] }')
+
+        return super(ImportFormView, self).form_valid(form)
+
+
+class ExportView(View):
+    def get(self, request):
+        management.call_command('dumpdata', format='json', output='db.json')
+
+        return FileResponse(open('db.json', 'rb'), as_attachment=True)
+
+
 def generate_results(event):
     categories = ProblemCategory.objects.filter(
         event=event).order_by('position')
@@ -168,7 +191,7 @@ def generate_results(event):
             'name': team.name,
             'school': team.school,
             'members': ', '.join([
-                '{} {}'.format(member.first_name, member.last_name)
+                f'{ member.first_name } { member.last_name }'
                 for member in team.participant_set.order_by('last_name', 'first_name')
             ]),
             **team.participant_set.aggregate(compensation=Sum('compensation__points')),
@@ -202,13 +225,6 @@ def generate_results(event):
         if event.flat_compensation:
             team['points'] += team['compensation']
 
-    # for team in teams:
-    #     team['problem_points'] = sum(
-    #         [category['points'] * category['count']
-    #          for category in team['categories']]
-    #     )
-    #     team['points'] = team['problem_points'] + team['compensation']
-
     # Sort teams
     team_comparator = itemgetter('points', 'problem_points')
     teams.sort(key=team_comparator, reverse=True)
@@ -221,7 +237,7 @@ def generate_results(event):
             teams[0]['rank'] = lower_rank
         else:
             for team_to_rank in teams:
-                team_to_rank['rank'] = "{} - {}".format(lower_rank, upper_rank)
+                team_to_rank['rank'] = f'{ lower_rank } - { upper_rank }'
 
         return upper_rank
 

@@ -1,15 +1,21 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 
 class Event(models.Model):
-    name = models.CharField(max_length=100)
+    EVENT_NAME_CHOICES = (
+        ('LOMIHLAV', 'Lomihlav'),
+        ('MAMUT', 'Mamut'),
+    )
+
+    name = models.CharField(max_length=100, choices=EVENT_NAME_CHOICES)
     date = models.DateField()
 
-    team_members = models.PositiveSmallIntegerField()
-    flat_compensation = models.BooleanField()
+    team_members = models.PositiveSmallIntegerField(null=True)
+    flat_compensation = models.BooleanField(null=True)
 
     def __str__(self):
-        return '{} {}'.format(self.name, self.date.year)
+        return f'{ self.get_name_display() } { self.date.year }'
 
 
 class ProblemCategory(models.Model):
@@ -33,7 +39,7 @@ class Solution(models.Model):
     problem_category = models.ForeignKey(
         'ProblemCategory', on_delete=models.CASCADE)
     problem_position = models.PositiveSmallIntegerField()
-    team = models.ForeignKey('participant.Team', on_delete=models.CASCADE)
+    team = models.ForeignKey('Team', on_delete=models.CASCADE)
     time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -41,3 +47,39 @@ class Solution(models.Model):
             self.team.event, self.team.name,
             self.problem_category.name,
             self.problem_position, self.time)
+
+
+class Team(models.Model):
+    name = models.CharField(max_length=200)
+    number = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(100), MaxValueValidator(999)])
+
+    school = models.CharField(max_length=300)
+
+    event = models.ForeignKey('Event', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '{}, {}'.format(self.name, self.school)
+
+
+class Participant(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+
+    team = models.ForeignKey('Team', on_delete=models.CASCADE)
+
+    compensation = models.ForeignKey('Compensation', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '{} {}, {}'.format(self.first_name, self.last_name, self.team.school)
+
+
+class Compensation(models.Model):
+    event = models.ForeignKey('Event', on_delete=models.CASCADE)
+    points = models.DecimalField(max_digits=6, decimal_places=2)
+
+    school_class = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(9)])
+
+    def __str__(self):
+        return 'Bonifikácia {}, {}. ročník'.format(self.event, self.school_class)

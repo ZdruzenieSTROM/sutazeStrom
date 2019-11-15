@@ -1,12 +1,7 @@
 # Lomihlav
 
-LOMIHLAV_CSV_FIELDS = [
-    'team', 'school', 'members',
-    'participant0_first_name', 'participant0_last_name', 'participant0_school_class',
-    'participant1_first_name', 'participant1_last_name', 'participant1_school_class',
-    'participant2_first_name', 'participant2_last_name', 'participant2_school_class',
-    'participant3_first_name', 'participant3_last_name', 'participant3_school_class',
-]
+LOMIHLAV_TEAM_MEMBERS = 4
+LOMIHLAV_FLAT_COMPENSATION = False
 
 LOMIHLAV_SCHOOL_CLASS_MAPPER = {
     'siedmy': 7,
@@ -18,7 +13,8 @@ LOMIHLAV_SCHOOL_CLASS_MAPPER = {
 }
 
 LOMIHLAV_PROBLEM_CATEGORIES = [
-    {'name': 'Úlohy', 'points': 1, 'count': 40, 'mcomp': True, 'is_problem': True},
+    {'name': 'Úlohy', 'points': 1, 'count': 40,
+     'mcomp': True, 'is_problem': True},
     {'name': 'Hádanky', 'points': 2, 'count': 4,
         'mcomp': False, 'is_problem': False},
     {'name': 'Hlavolamy', 'points': 2, 'count': 4,
@@ -31,9 +27,18 @@ LOMIHLAV_COMPENSATIONS = [
     {'class': 9, 'points': 0.75},
 ]
 
-LOMIHLAV_TEAM_MEMBERS = 4
+LOMIHLAV_CSV_FIELDS = [
+    'team', 'school', 'members',
+    'participant0_first_name', 'participant0_last_name', 'participant0_school_class',
+    'participant1_first_name', 'participant1_last_name', 'participant1_school_class',
+    'participant2_first_name', 'participant2_last_name', 'participant2_school_class',
+    'participant3_first_name', 'participant3_last_name', 'participant3_school_class',
+]
 
 # Mamut
+
+MAMUT_TEAM_MEMBERS = 5
+MAMUT_FLAT_COMPENSATION = True
 
 MAMUT_CSV_FIELDS = [
     'team', 'school', 'members',
@@ -64,5 +69,3 @@ MAMUT_COMPENSATIONS = [
     {'class': 5, 'points': 3},
     {'class': 6, 'points': 1},
 ]
-
-MAMUT_TEAM_MEMBERS = 5

@@ -10,6 +10,12 @@
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
 
     {% block meta %}{% endblock %}
+
+    <style>
+        .asteriskField {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -20,7 +26,8 @@
         </button>
         <div class="collapse navbar-collapse" id="navbar-content">
             <div class="navbar-nav">
-                <a class="nav-item nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'competition:index' %}">
+                <a class="nav-item nav-link {% if request.path == '/' %}active{% endif %}"
+                    href="{% url 'competition:index' %}">
                     Hlavná stránka</a>
                 <a class="nav-item nav-link" href="{% url 'admin:index' %}">Admin</a>
             </div>
