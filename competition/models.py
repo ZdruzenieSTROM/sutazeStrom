@@ -8,8 +8,10 @@ class Event(models.Model):
         ('MAMUT', 'Mamut'),
     )
 
-    name = models.CharField(max_length=100, choices=EVENT_NAME_CHOICES)
-    date = models.DateField()
+    name = models.CharField(
+        max_length=100, choices=EVENT_NAME_CHOICES, verbose_name='Názov')
+    date = models.DateField(verbose_name='Dátum konania',
+                            help_text='Formát: RRRR-MM-DD')
 
     team_members = models.PositiveSmallIntegerField(null=True)
     flat_compensation = models.BooleanField(null=True)
@@ -32,7 +34,7 @@ class ProblemCategory(models.Model):
         verbose_name_plural = 'problem categories'
 
     def __str__(self):
-        return '{}, {}'.format(self.event, self.name)
+        return f'{ self.event }, { self.name }'
 
 
 class Solution(models.Model):
@@ -43,10 +45,8 @@ class Solution(models.Model):
     time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return '{}, {}, úloha {} - {}, {}'.format(
-            self.team.event, self.team.name,
-            self.problem_category.name,
-            self.problem_position, self.time)
+        return f'{ self.team.event }, { self.team.name }, '\
+            f'úloha { self.problem_category.name } - { self.problem_position }, { self.time }'
 
 
 class Team(models.Model):
@@ -59,7 +59,7 @@ class Team(models.Model):
     event = models.ForeignKey('Event', on_delete=models.CASCADE)
 
     def __str__(self):
-        return '{}, {}'.format(self.name, self.school)
+        return f'{ self.name }, { self.school }'
 
 
 class Participant(models.Model):
@@ -71,7 +71,7 @@ class Participant(models.Model):
     compensation = models.ForeignKey('Compensation', on_delete=models.CASCADE)
 
     def __str__(self):
-        return '{} {}, {}'.format(self.first_name, self.last_name, self.team.school)
+        return f'{ self.first_name } { self.last_name }, { self.team.school }'
 
 
 class Compensation(models.Model):
@@ -82,4 +82,4 @@ class Compensation(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(9)])
 
     def __str__(self):
-        return 'Bonifikácia {}, {}. ročník'.format(self.event, self.school_class)
+        return f'Bonifikácia { self.event }, { self.school_class }. ročník'

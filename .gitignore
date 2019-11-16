@@ -6,4 +6,4 @@ db.sqlite3
 db.json
 sutazestrom/
 run.sh
-static_root/
+static/
