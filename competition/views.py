@@ -146,8 +146,8 @@ class CSVResultsView(View, SingleObjectMixin):
         for team in teams:
             row = [team['rank'], team['name'], team['school'],
                    team['members'], team['compensation']]
-            row.extend([category['count'] for category in team['categories']])
-            row.extend([team['problem_points'], team['points']])
+            row.extend(team['solved_by_category'])
+            row.extend([team['problem_points'], team['total_points']])
 
             writer.writerow(row)
 
@@ -195,39 +195,43 @@ def generate_results(event):
                 for member in team.participant_set.order_by('last_name', 'first_name')
             ]),
             **team.participant_set.aggregate(compensation=Sum('compensation__points')),
-            'categories': [
-                {
-                    'points': category.points,
-                    'count': team.solution_set.filter(problem_category=category).count(),
-                } for category in categories
+            'solved_by_category': [
+                team.solution_set.filter(problem_category=category).count()
+                for category in categories
             ],
-            'points': Decimal(0),
-            'problem_points': Decimal(0)
+            'total_points': Decimal(0),
+            'problem_points': Decimal(0),
+            'solved_problems': 0,
         } for team in Team.objects.filter(event=event)
     ]
 
     # Compute points
 
     for team in teams:
-        for category_stats, category in zip(team['categories'], categories):
+        for count, category in zip(team['solved_by_category'], categories):
             if category.multiplicative_compensation:
-                category_points = category_stats['count'] * \
-                    category_stats['points']*team['compensation']
+                category_points = count * \
+                    category.points*team['compensation']
             else:
-                category_points = category_stats['count'] * \
-                    category_stats['points']
+                category_points = count * \
+                    category.points
 
-            team['points'] += category_points
+            team['total_points'] += category_points
 
             if category.is_problem:
+                team['solved_problems'] += count
                 team['problem_points'] += category_points
 
         if event.flat_compensation:
-            team['points'] += team['compensation']
+            team['total_points'] += team['compensation']
 
     # Sort teams
-    team_comparator = itemgetter('points', 'problem_points')
-    teams.sort(key=team_comparator, reverse=True)
+    if event.name == 'LOMIHLAV':
+        team_key = itemgetter('total_points', 'solved_problems')
+    else:
+        team_key = itemgetter('total_points', 'problem_points')
+
+    teams.sort(key=team_key, reverse=True)
 
     # Generate ranks
     def save_team_ranks(teams, lower_rank):
@@ -246,7 +250,7 @@ def generate_results(event):
 
     for team in teams:
         if not identically_ranked_teams or\
-                team_comparator(team) == team_comparator(identically_ranked_teams[-1]):
+                team_key(team) == team_key(identically_ranked_teams[-1]):
             identically_ranked_teams.append(team)
         else:
             lower_rank = save_team_ranks(

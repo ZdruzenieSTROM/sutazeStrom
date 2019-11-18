@@ -30,11 +30,11 @@
       <td>{{ team.school }}</td>
       <td>{{ team.members }}</td>
       <td>{{ team.compensation|floatformat:1 }}</td>
-      {% for category in team.categories %}
-      <td>{{ category.count }}</td>
+      {% for count in team.solved_by_category %}
+      <td>{{ count }}</td>
       {% endfor %}
       <td>{{ team.problem_points|floatformat:1 }}</td>
-      <td>{{ team.points|floatformat:1 }}</td>
+      <td>{{ team.total_points|floatformat:1 }}</td>
     </tr>
     {% endfor %}
   </tbody>
