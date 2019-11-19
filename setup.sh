@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ENV_NAME=sutazestrom
+ENV_NAME=sutazestrom-env
 
 cd $(dirname $0)
 
