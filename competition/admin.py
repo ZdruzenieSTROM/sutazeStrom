@@ -4,51 +4,40 @@ from .models import (Compensation, Event, Participant, ProblemCategory,
                      Solution, Team)
 
 
-class ParticipantInline(admin.TabularInline):
-    model = Participant
-    extra = 0
+@admin.register(ProblemCategory)
+class ProblemCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'event', 'problem_count', 'points',)
 
-    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
-
-        if kwargs:
-            t = Team.objects.get(pk=resolve(
-                request.path_info).kwargs['object_id'])
-
-            kwargs['queryset'] = Participant.objects.filter(team=t)
-
-        return super(ParticipantInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
+    ordering = ('event', 'position',)
 
 
+@admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
-    list_display = ('name', 'number', 'school', 'event')
-    readonly_fields = ('number',)
+    list_display = ('name', 'number', 'school', 'event',)
     list_filter = ('event',)
     list_per_page = 100
 
-    inlines = [ParticipantInline]
+    class ParticipantInline(admin.TabularInline):
+        model = Participant
+        extra = 0
 
-    search_fields = [
-        'name',
-        'school',
-        'number',
-    ]
-    ordering = ('number', '-pk')
+    readonly_fields = ('number',)
+    inlines = (ParticipantInline,)
+
+    search_fields = ('name', 'school', 'number',)
+    ordering = ('number', '-pk',)
 
 
+@admin.register(Participant)
 class ParticipantAdmin(admin.ModelAdmin):
-    list_display = ('team', 'first_name', 'last_name', 'compensation')
+    list_display = ('first_name', 'last_name', 'team', 'compensation',)
     list_per_page = 100
 
-    search_fields = [
-        'first_name',
-        'last_name',
-    ]
-    ordering = ('last_name', 'first_name', '-pk')
+    search_fields = ('first_name', 'last_name',)
+
+    ordering = ('last_name', 'first_name', '-pk',)
 
 
 admin.site.register(Event)
-admin.site.register(ProblemCategory)
 admin.site.register(Solution)
 admin.site.register(Compensation)
-admin.site.register(Participant, ParticipantAdmin)
-admin.site.register(Team, TeamAdmin)
