@@ -27,15 +27,19 @@ rem Deaktivuj prostredie pre python
 call %ENV_NAME%\Scripts\deactivate.bat
 
 rem Vytvor skript na spustenie serveru
-echo chcp 65001> run.bat
+echo @echo off> run.bat
+echo.>> run.bat
+echo chcp 65001>> run.bat
+echo.>> run.bat
+echo cd %%^~dp0>> run.bat
 echo.>> run.bat
 echo title Odovzdávač>> run.bat
 echo.>> run.bat
 echo call %ENV_NAME%\Scripts\activate.bat>> run.bat
 echo.>> run.bat
-echo python manage.py runserver 0.0.0.0:8000>> run.bat
+echo start "Odovzdávač" python manage.py runserver 0.0.0.0:8000>> run.bat
 echo.>> run.bat
-echo call %ENV_NAME\Scripts\deactivate.bat>> run.bat
+echo call %ENV_NAME%\Scripts\deactivate.bat>> run.bat
 
 rem Spusti server
 call run.bat
