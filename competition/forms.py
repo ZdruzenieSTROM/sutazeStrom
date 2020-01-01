@@ -10,6 +10,8 @@ from django.conf import settings
 from .models import (Compensation, Event, Participant, ProblemCategory,
                      Solution, Team)
 
+# TODO: come up with slightly better control digits,
+# possibly move them to settings file
 CONTROL = [5, 1, 9, 3, 7]
 
 
@@ -33,7 +35,7 @@ class SubmitForm(forms.Form):
         except ValueError:
             raise forms.ValidationError('Nesprávny formát!')
 
-        if (len(code) != 6 and require_control_sum) or (len(code) != 5 and not require_control_sum):
+        if len(code) != 6 and (not require_control_sum and len(code) != 5):
             raise forms.ValidationError('Nesprávna dĺžka kódu!')
 
         if require_control_sum:
@@ -41,6 +43,9 @@ class SubmitForm(forms.Form):
 
             if checksum != reduce(lambda p, n: p + n[0]*n[1], zip(code, CONTROL), 0) % 10:
                 raise forms.ValidationError('Neplatný kontrolný súčet!')
+
+        elif len(code) == 6:
+            code = code[:-1]
 
         return reduce(lambda p, n: p*10 + n, code)
 
