@@ -16,6 +16,11 @@ class Event(models.Model):
     frozen_results = models.TextField(null=True,blank=True,verbose_name='Zmrznutá výsledkovka')
     team_members = models.PositiveSmallIntegerField(null=True)
     flat_compensation = models.BooleanField(null=True)
+    length = models.DurationField()
+    started_at = models.DateTimeField()
+
+    def end_time(self):
+        return self.started_at + self.length
 
     def __str__(self):
         return f'{ self.get_name_display() } { self.date.year }'

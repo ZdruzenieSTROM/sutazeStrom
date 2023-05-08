@@ -3,6 +3,7 @@
 {% block title %}{{ event }} &ndash; Odovzdaj{% endblock %}
 
 {% block content %}
+Do konca zostáva: <div id="countdown"></div>
 <form action="{% url 'competition:submit' event.pk %}" method="POST" autocomplete="off">
   {% csrf_token %}
 
@@ -63,5 +64,7 @@
   input.onblur = function () {
     setTimeout(focuser, 0);
   };
+    var countdownTime = new Date('{{ event.end_time.isoformat }}').getTime();  // this has to be a part of the html template to use context
+    setCountdown();
 </script>
 {% endblock %}

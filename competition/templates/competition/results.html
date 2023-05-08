@@ -2,12 +2,15 @@
 
 {% block title %}{{ event }} &ndash; Výsledky{% endblock %}
 
+
 {% block meta %}
 <meta http-equiv="refresh" content="30" />
 {% endblock %}
 
 
 {% block content %}
+
+Do konca zostáva: <div id="countdown"></div>
 {% if request.user.is_staff %}
 <form action="{% url 'competition:results' event.pk %}" method="POST" >
   {% csrf_token %}
@@ -55,4 +58,8 @@
     {% endfor %}
   </tbody>
 </table>
+<script>
+  var countdownTime = new Date('{{ event.end_time.isoformat }}').getTime();  // this has to be a part of the html template to use context
+  setCountdown();
+</script>
 {% endblock %}
