@@ -117,9 +117,7 @@ class ResultsView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ResultsView, self).get_context_data(**kwargs)
-
         context['categories'], context['teams'] = generate_results(self.object)
-
         return context
     
     def post(self,request,pk):
