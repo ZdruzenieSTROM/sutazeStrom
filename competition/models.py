@@ -13,6 +13,7 @@ class Event(models.Model):
     date = models.DateField(verbose_name='Dátum konania',
                             help_text='Formát: RRRR-MM-DD')
 
+    frozen_results = models.TextField(null=True,blank=True,verbose_name='Zmrznutá výsledkovka')
     team_members = models.PositiveSmallIntegerField(null=True)
     flat_compensation = models.BooleanField(null=True)
 

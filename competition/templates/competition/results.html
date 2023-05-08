@@ -6,7 +6,23 @@
 <meta http-equiv="refresh" content="30" />
 {% endblock %}
 
+
 {% block content %}
+{% if request.user.is_staff %}
+<form action="{% url 'competition:results' event.pk %}" method="POST" >
+  {% csrf_token %}
+  <input type="hidden" id="freeze" name="freeze" value="True">
+  <button type="submit" >
+    <span aria-hidden="true">
+      {% if event.frozen_results %}
+        Updatni aktuálne výsledky
+      {% else %}
+        Zmraz aktuálne výsledky
+      {% endif %}
+    </span>
+  </button>
+</form>
+{% endif %}
 <table class="table">
   <thead>
     <tr>

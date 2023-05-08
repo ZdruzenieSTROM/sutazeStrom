@@ -1,5 +1,6 @@
 import csv
 from decimal import Decimal
+import json
 from operator import itemgetter
 
 from django.conf import settings
@@ -120,7 +121,25 @@ class ResultsView(DetailView):
         context['categories'], context['teams'] = generate_results(self.object)
 
         return context
+    
+    def post(self,request,pk):
+        if request.user.is_staff:
+            self.object = self.get_object()
+            if self.request.POST['freeze']:
+                _, results = generate_results(self.object)
+                self.object.frozen_results = json.dumps(self.object.frozen_results)
+            else:
+                self.object.frozen_results = None
+            self.object.save()
+            return self.get(request,pk=pk)
 
+class PublicResultsView(ResultsView):
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.object.frozen_results is None:
+            context['teams'] = self.object.frozen_results
+        return context
 
 class CSVResultsView(View, SingleObjectMixin):
     model = Event
