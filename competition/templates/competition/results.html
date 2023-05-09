@@ -10,7 +10,7 @@
 
 {% block content %}
 
-Do konca zostáva: <div id="countdown"></div>
+Do konca zostáva: <div id="countdown" class="countdown"></div>
 {% if request.user.is_staff %}
 <form action="{% url 'competition:results' event.pk %}" method="POST" >
   {% csrf_token %}

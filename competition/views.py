@@ -13,6 +13,7 @@ from django.views import View
 from django.views.generic import DetailView, FormView, ListView, View
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormView
+from django.utils.timezone import now
 
 from .forms import ImportForm, InitializeForm, SubmitForm
 from .models import Event, ProblemCategory, Solution, Team
@@ -52,6 +53,14 @@ class EventDetailView(DetailView):
     context_object_name = 'event'
 
     template_name = 'competition/event.html'
+
+    def post(self,request,pk):
+        """Start event"""
+        self.object = self.get_object()
+        if self.object.started_at is None:
+            self.object.started_at = now()
+            self.object.save()
+        return self.get(request=request,pk=pk)
 
 
 class InitializeView(FormView):

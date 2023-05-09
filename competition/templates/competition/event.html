@@ -10,5 +10,10 @@
   <a class="list-group-item list-group-item-action" href="{% url 'competition:public-results' event.pk %}">Verejné výsledky</a>
   <a class="list-group-item list-group-item-action" href="{% url 'competition:results' event.pk %}">Výsledky</a>
   <a class="list-group-item list-group-item-action" href="{% url 'competition:csv_results' event.pk %}">Výsledky (CSV)</a>
+  {% if not event.started_at %}
+  <form action="{% url 'competition:event' event.pk %}" method="POST">
+    <input class="list-group-item list-group-item-action" type="submit" value="Odštartuj súťaž">
+  </form>
+  {% endif %}
 </div>
 {% endblock %}
