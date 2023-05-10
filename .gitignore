@@ -7,4 +7,5 @@ db.json
 sutazestrom-env/
 run.sh
 run.bat
-static/
+/static/
+
