@@ -25,6 +25,17 @@ Do konca zostáva: <div id="countdown" class="countdown"></div>
     </span>
   </button>
 </form>
+{% if event.frozen_results %}
+<form action="{% url 'competition:results' event.pk %}" method="POST" >
+  {% csrf_token %}
+  <input type="hidden" id="freeze2" name="freeze" value="False">
+  <button type="submit" >
+    <span aria-hidden="true">
+        Rozmraz aktuálne výsledky
+    </span>
+  </button>
+</form>
+{% endif %}
 {% endif %}
 <table class="table">
   <thead>
