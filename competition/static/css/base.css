@@ -1,0 +1,21 @@
+.main-button {
+    color: black;
+    background-color: white;
+    border: black 2px solid;
+    font-weight: bold;
+}
+
+.main-button:hover {
+    color: white;
+    background-color: black;
+}
+
+.main-button__disabled {
+    color: gray;
+    border-color: gray;
+}
+
+.main-button__disabled:hover {
+    color: gray;
+    background-color: white;
+}
