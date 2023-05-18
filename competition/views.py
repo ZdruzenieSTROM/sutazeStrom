@@ -131,6 +131,7 @@ class ResultsView(DetailView):
     
     def serialize_results(self,results):
         for team in results:
+            team['compensation'] = str(team['compensation'])
             team['total_points'] = str(team['total_points'])
             team['problem_points'] = str(team['problem_points'])
         return json.dumps(results)
