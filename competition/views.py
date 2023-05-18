@@ -132,7 +132,7 @@ class ResultsView(DetailView):
     def post(self,request,pk):
         if request.user.is_staff:
             self.object = self.get_object()
-            if self.request.POST['freeze']:
+            if self.request.POST['freeze'] == "True":  # self.request.POST['freeze'] is always a string and even "False" evaluates to True
                 _, results = generate_results(self.object)
                 self.object.frozen_results = json.dumps(self.object.frozen_results)
             else:
