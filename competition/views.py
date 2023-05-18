@@ -129,12 +129,18 @@ class ResultsView(DetailView):
         context['categories'], context['teams'] = generate_results(self.object)
         return context
     
+    def serialize_results(self,results):
+        for team in results:
+            team['total_points'] = str(team['total_points'])
+            team['problem_points'] = str(team['problem_points'])
+        return json.dumps(results)
+    
     def post(self,request,pk):
         if request.user.is_staff:
             self.object = self.get_object()
             if self.request.POST['freeze']:
                 _, results = generate_results(self.object)
-                self.object.frozen_results = json.dumps(self.object.frozen_results)
+                self.object.frozen_results = self.serialize_results(results)
             else:
                 self.object.frozen_results = None
             self.object.save()
