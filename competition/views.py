@@ -1,12 +1,13 @@
 import csv
 from decimal import Decimal
 from operator import itemgetter
+from typing import Any, Dict
 
 from django.conf import settings
 from django.contrib import messages
 from django.core import management
 from django.db.models import Count, Q, Sum
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, HttpRequest, HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, FormView, ListView, View
@@ -171,7 +172,39 @@ class ImportFormView(FormView):
             f' počet účastníkov: { saved["participants"] }')
 
         return super(ImportFormView, self).form_valid(form)
+    
+class StatisticsView(DetailView):
+    model = Event
+    context_object_name = 'event'
+    template_name = 'competition/statistics.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        categories = ProblemCategory.objects.filter(event=self.object).all()
+        problem_statistics = {}
+        for category in categories:
+            solutions = Solution.objects.filter(
+                team__event=self.object,
+                problem_category=category
+                ).all()
+            number_of_teams = Team.objects.filter(event=self.object).count()
+            stats = []
+            for _ in range(number_of_teams):
+                stats.append([0]*category.problem_count)
+            for solution in solutions:
+                stats[solution.team.number-100][solution.problem_position-1] = 1
+
+            problem_statistics[category.name] = {
+                'stats':stats,
+                'problems': list(range(category.problem_count))
+            }
+        context['stats'] = problem_statistics
+        return context
+
+class StatisticsCsvExportView(StatisticsView):
+    def get(self, request, *args, **kwargs):
+        pass
 
 class ExportView(View):
     def get(self, request):
