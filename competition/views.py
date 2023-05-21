@@ -152,7 +152,7 @@ class PublicResultsView(ResultsView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.object.frozen_results is not None:
-            context['teams'] = self.object.frozen_results
+            context['teams'] = json.loads(self.object.frozen_results)
         return context
 
 class CSVResultsView(View, SingleObjectMixin):
