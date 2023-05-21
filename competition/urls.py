@@ -3,7 +3,7 @@ from django.urls import path
 
 from .views import (CSVResultsView, EventDetailView, EventListView, ExportView,
                     ImportFormView, InitializeView, ResultsView,
-                    SubmitFormView,StatisticsView)
+                    StatisticsCsvExportView, StatisticsView, SubmitFormView)
 
 app_name = 'competition'
 
@@ -16,8 +16,10 @@ urlpatterns = [
          staff_member_required(ResultsView.as_view()), name='results'),
     path('<int:pk>/csvresults/',
          staff_member_required(CSVResultsView.as_view()), name='csv_results'),
-     path('<int:pk>/statistics/',
+    path('<int:pk>/statistics/',
          staff_member_required(StatisticsView.as_view()), name='statistics'),
+    path('<int:pk>/csvstatistics/',
+         staff_member_required(StatisticsCsvExportView.as_view()), name='statistics'),
     path('initialize', staff_member_required(
         InitializeView.as_view()), name='initialize'),
     path('import/', staff_member_required(ImportFormView.as_view()), name='import'),

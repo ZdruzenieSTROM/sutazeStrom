@@ -200,11 +200,30 @@ class StatisticsView(DetailView):
                 'problems': list(range(category.problem_count))
             }
         context['stats'] = problem_statistics
+        context['number_of_teams'] = number_of_teams
         return context
 
 class StatisticsCsvExportView(StatisticsView):
     def get(self, request, *args, **kwargs):
-        pass
+        self.object = self.get_object()
+        context = self.get_context_data()
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="export.csv"'
+
+        writer = csv.writer(response, delimiter=settings.CSV_DELIMITER)
+        joined_header = ['Číslo tímu']
+        joined_stats = [[]  for _ in range(context['number_of_teams'])]
+        for category_name,category_stats in context['stats'].items():
+            joined_header.extend([f'{category_name[:3]} {i+1}.' for i in category_stats['problems']])
+            for i,team_stats in enumerate(category_stats['stats']):
+                joined_stats[i].extend(team_stats)
+
+        writer.writerow(joined_header)
+        for i,team in enumerate(joined_stats):
+            row = [i]
+            row.extend(team)
+            writer.writerow(row)
+        return response
 
 class ExportView(View):
     def get(self, request):
