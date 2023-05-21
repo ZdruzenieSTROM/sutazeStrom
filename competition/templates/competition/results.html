@@ -8,6 +8,13 @@
 {% endblock %}
 
 
+{% block navbar %}
+{% if request.user.is_staff %}
+{{ block.super }}
+{% endif %}
+{% endblock %}
+
+
 {% block content %}
 
 Do konca zostáva: <div id="countdown" class="countdown"></div>
@@ -38,7 +45,7 @@ Do konca zostáva: <div id="countdown" class="countdown"></div>
       </form>
     {% endif %}
   </div>
-{% endif %}
+  {% endif %}
 <table class="table">
   <thead>
     <tr>

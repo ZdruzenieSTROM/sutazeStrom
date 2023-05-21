@@ -24,6 +24,7 @@
 </head>
 
 <body>
+    {% block navbar %}
     <nav class="navbar navbar-expand-sm sticky-top navbar-dark bg-dark">
         <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#navbar-content"
             aria-controls="navbar-content" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,6 +44,7 @@
             {% endif %}
         </div>
     </nav>
+    {% endblock %}
 
     <div class="container-fluid" style="padding:15px;">
         {% for message in messages %}
