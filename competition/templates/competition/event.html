@@ -9,5 +9,7 @@
   <a class="list-group-item list-group-item-action" href="{% url 'competition:submit' event.pk %}">Odovzdávač</a>
   <a class="list-group-item list-group-item-action" href="{% url 'competition:results' event.pk %}">Výsledky</a>
   <a class="list-group-item list-group-item-action" href="{% url 'competition:csv_results' event.pk %}">Výsledky (CSV)</a>
+  <a class="list-group-item list-group-item-action" href="{% url 'competition:statistics' event.pk %}">Štatistiky</a>
+  <a class="list-group-item list-group-item-action" href="{% url 'competition:csv_statistics' event.pk %}">Štatistiky (CSV)</a>
 </div>
 {% endblock %}
