@@ -13,8 +13,14 @@ class Event(models.Model):
     date = models.DateField(verbose_name='Dátum konania',
                             help_text='Formát: RRRR-MM-DD')
 
+    frozen_results = models.TextField(null=True,blank=True,verbose_name='Zmrznutá výsledkovka')
     team_members = models.PositiveSmallIntegerField(null=True)
     flat_compensation = models.BooleanField(null=True)
+    length = models.DurationField(verbose_name='Trvanie súťaže')
+    started_at = models.DateTimeField(null=True,blank=True)
+
+    def end_time(self):
+        return self.started_at + self.length
 
     def __str__(self):
         return f'{ self.get_name_display() } { self.date.year }'

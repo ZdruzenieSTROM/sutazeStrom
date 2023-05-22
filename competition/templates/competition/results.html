@@ -2,11 +2,50 @@
 
 {% block title %}{{ event }} &ndash; Výsledky{% endblock %}
 
+
 {% block meta %}
 <meta http-equiv="refresh" content="30" />
 {% endblock %}
 
+
+{% block navbar %}
+{% if request.user.is_staff %}
+{{ block.super }}
+{% endif %}
+{% endblock %}
+
+
 {% block content %}
+
+Do konca zostáva: <div id="countdown" class="countdown"></div>
+{% if request.user.is_staff %}
+  <div class="row">
+    <form action="{% url 'competition:results' event.pk %}" method="POST" class="m-2">
+      {% csrf_token %}
+      <input type="hidden" id="freeze" name="freeze" value="True">
+      <button type="submit" class="main-button">
+        <span aria-hidden="true">
+          {% if event.frozen_results %}
+            Updatni aktuálne výsledky
+          {% else %}
+            Zmraz aktuálne výsledky
+          {% endif %}
+        </span>
+      </button>
+    </form>
+    {% if event.frozen_results %}
+      <form action="{% url 'competition:results' event.pk %}" method="POST" class="m-2">
+        {% csrf_token %}
+        <input type="hidden" id="freeze2" name="freeze" value="False">
+        <button type="submit" class="main-button">
+          <span aria-hidden="true">
+            Rozmraz aktuálne výsledky
+          </span>
+        </button>
+      </form>
+    {% endif %}
+  </div>
+  {% endif %}
 <table class="table">
   <thead>
     <tr>
@@ -39,4 +78,8 @@
     {% endfor %}
   </tbody>
 </table>
+<script>
+  var countdownTime = new Date('{{ event.end_time.isoformat }}').getTime();  // this has to be a part of the html template to use context
+  setCountdown();
+</script>
 {% endblock %}

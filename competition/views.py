@@ -1,5 +1,6 @@
 import csv
 from decimal import Decimal
+import json
 from operator import itemgetter
 
 from django.conf import settings
@@ -12,6 +13,7 @@ from django.views import View
 from django.views.generic import DetailView, FormView, ListView, View
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormView
+from django.utils.timezone import now
 
 from .forms import ImportForm, InitializeForm, SubmitForm
 from .models import Event, ProblemCategory, Solution, Team
@@ -51,6 +53,14 @@ class EventDetailView(DetailView):
     context_object_name = 'event'
 
     template_name = 'competition/event.html'
+
+    def post(self,request,pk):
+        """Start event"""
+        self.object = self.get_object()
+        if self.object.started_at is None:
+            self.object.started_at = now()
+            self.object.save()
+        return self.get(request=request,pk=pk)
 
 
 class InitializeView(FormView):
@@ -116,11 +126,34 @@ class ResultsView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ResultsView, self).get_context_data(**kwargs)
-
         context['categories'], context['teams'] = generate_results(self.object)
-
         return context
+    
+    def serialize_results(self,results):
+        for team in results:
+            team['compensation'] = str(team['compensation'])
+            team['total_points'] = str(team['total_points'])
+            team['problem_points'] = str(team['problem_points'])
+        return json.dumps(results)
+    
+    def post(self,request,pk):
+        if request.user.is_staff:
+            self.object = self.get_object()
+            if self.request.POST['freeze'] == "True":  # self.request.POST['freeze'] is always a string and even "False" evaluates to True
+                _, results = generate_results(self.object)
+                self.object.frozen_results = self.serialize_results(results)
+            else:
+                self.object.frozen_results = None
+            self.object.save()
+            return self.get(request,pk=pk)
 
+class PublicResultsView(ResultsView):
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.object.frozen_results is not None:
+            context['teams'] = json.loads(self.object.frozen_results)
+        return context
 
 class CSVResultsView(View, SingleObjectMixin):
     model = Event
