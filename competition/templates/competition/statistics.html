@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event }} &ndash; Štatistiky{% endblock %}
+
+{% block content %}
+{% for category_name,category_stats in stats.items %}
+    <h2>{{category_name}}</h2>
+    <table>
+        <tr>
+        <th>Číslo tímu</th>
+        {% for problem in category_stats.problems %}
+            <th>{{problem}}.</th>
+        {% endfor %}
+        </tr>
+    {% for team in category_stats.stats %}
+        <tr>
+            <td>{{forloop.counter|add:100}}.</td>
+        {% for problem in team %}
+            <td bgcolor="{% if problem %}green{% else %}red{% endif %}">{{problem}}</td>
+        {% endfor %}
+        </tr>
+    {% endfor %}
+    </table>
+{% endfor %}
+{% endblock %}
