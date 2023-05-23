@@ -20,7 +20,7 @@ urlpatterns = [
     path('<int:pk>/statistics/',
          staff_member_required(StatisticsView.as_view()), name='statistics'),
     path('<int:pk>/csvstatistics/',
-         staff_member_required(StatisticsCsvExportView.as_view()), name='statistics'),
+         staff_member_required(StatisticsCsvExportView.as_view()), name='csv_statistics'),
     path('initialize', staff_member_required(
         InitializeView.as_view()), name='initialize'),
     path('import/', staff_member_required(ImportFormView.as_view()), name='import'),
