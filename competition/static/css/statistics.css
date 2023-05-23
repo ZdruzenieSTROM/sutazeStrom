@@ -1,0 +1,16 @@
+th {
+    text-align: center;
+    min-width: 1.5vw;
+}
+
+td {
+    text-align: center;
+}
+
+.statistics__cell--success {
+    background-color: green;
+}
+
+.statistics__cell--fail {
+    background-color: red;
+}

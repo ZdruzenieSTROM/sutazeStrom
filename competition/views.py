@@ -2,12 +2,13 @@ import csv
 from decimal import Decimal
 import json
 from operator import itemgetter
+from typing import Any, Dict
 
 from django.conf import settings
 from django.contrib import messages
 from django.core import management
 from django.db.models import Count, Q, Sum
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, HttpRequest, HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, FormView, ListView, View
@@ -204,7 +205,59 @@ class ImportFormView(FormView):
             f' počet účastníkov: { saved["participants"] }')
 
         return super(ImportFormView, self).form_valid(form)
+    
+class StatisticsView(DetailView):
+    model = Event
+    context_object_name = 'event'
+    template_name = 'competition/statistics.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        categories = ProblemCategory.objects.filter(event=self.object).all()
+        problem_statistics = {}
+        for category in categories:
+            solutions = Solution.objects.filter(
+                team__event=self.object,
+                problem_category=category
+                ).all()
+            number_of_teams = Team.objects.filter(event=self.object).count()
+            stats = []
+            for _ in range(number_of_teams):
+                stats.append([0]*category.problem_count)
+            for solution in solutions:
+                # TODO: Tie operacie so 100 vyzeraju dost nebezpecne, to by mozno bolo dobre vytiahnut do osobitnych metod
+                stats[solution.team.number-100][solution.problem_position-1] = 1
+
+            problem_statistics[category.name] = {
+                'stats':stats,
+                'problems': list(range(category.problem_count))
+            }
+        context['stats'] = problem_statistics
+        context['number_of_teams'] = number_of_teams
+        return context
+
+class StatisticsCsvExportView(StatisticsView):
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data()
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="export.csv"'
+
+        writer = csv.writer(response, delimiter=settings.CSV_DELIMITER)
+        joined_header = ['Číslo tímu']
+        joined_stats = [[]  for _ in range(context['number_of_teams'])]
+        for category_name,category_stats in context['stats'].items():
+            joined_header.extend([f'{category_name[:3]} {i+1}.' for i in category_stats['problems']])
+            for i,team_stats in enumerate(category_stats['stats']):
+                joined_stats[i].extend(team_stats)
+
+        writer.writerow(joined_header)
+        for i,team in enumerate(joined_stats):
+            row = [i]
+            row.extend(team)
+            writer.writerow(row)
+        return response
 
 class ExportView(View):
     def get(self, request):
