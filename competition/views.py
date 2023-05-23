@@ -226,6 +226,7 @@ class StatisticsView(DetailView):
             for _ in range(number_of_teams):
                 stats.append([0]*category.problem_count)
             for solution in solutions:
+                # TODO: Tie operacie so 100 vyzeraju dost nebezpecne, to by mozno bolo dobre vytiahnut do osobitnych metod
                 stats[solution.team.number-100][solution.problem_position-1] = 1
 
             problem_statistics[category.name] = {
