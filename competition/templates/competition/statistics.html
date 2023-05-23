@@ -9,7 +9,7 @@
         <tr>
         <th>Číslo tímu</th>
         {% for problem in category_stats.problems %}
-            <th>{{problem}}.</th>
+            <th>{{problem|add:1}}.</th>
         {% endfor %}
         </tr>
     {% for team in category_stats.stats %}
