@@ -46,6 +46,9 @@ Do konca zostáva: <div id="countdown" class="countdown"></div>
     {% endif %}
   </div>
   {% endif %}
+{% if event.frozen_results %}
+  <div>Výsledky sú zmrazené. Skutočné výsledky zobrazíme, až po súťaži.</div>
+{% endif %}
 <table class="table">
   <thead>
     <tr>
