@@ -58,7 +58,7 @@ MAMUT_SCHOOL_CLASS_MAPPER = {
 MAMUT_PROBLEM_CATEGORIES = [
     {'name': 'Ľahké', 'points': 1, 'count': 30,
         'mcomp': False, 'is_problem': True},
-    {'name': 'Stredné', 'points': 3, 'count': 25,
+    {'name': 'Stredné', 'points': 3, 'count': 20,
         'mcomp': False, 'is_problem': True},
     {'name': 'Ťažké', 'points': 5, 'count': 10,
         'mcomp': False, 'is_problem': True},

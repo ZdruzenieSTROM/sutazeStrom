@@ -11,8 +11,10 @@ from django.db.models import Sum
 from django.http import FileResponse, HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
+from django.views import View
 from django.views.generic import DetailView, FormView, ListView, View
 from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.edit import FormView
 
 from .forms import ImportForm, InitializeForm, SubmitForm
 from .models import Event, ProblemCategory, Solution, Team
@@ -190,6 +192,48 @@ class CSVResultsView(View, SingleObjectMixin):
             writer.writerow(row)
 
         return response
+
+
+class CertificatesView(DetailView):
+    """Generovanie latex vstupu pre diplomy"""
+    model = Event
+    context_object_name = 'event'
+
+    template_name = 'competition/certificates.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        _, teams = generate_results(self.object)
+        context['team_certificates'] = map(
+            self.format_team_certificate, teams)
+        context['members_certificates'] = map(
+            self.format_members_certificate, teams)
+        return context
+
+    @staticmethod
+    def format_rank(rank: str) -> str:
+        if isinstance(rank, str):
+            return rank.split('-')[0].strip()
+        return rank
+
+    @staticmethod
+    def format_members(members: str) -> str:
+        members = members.split(',')
+        if len(members) > 1:
+            return ' \\& '.join([', '.join(members[:-1]), members[-1]])
+        return members
+
+    @classmethod
+    def format_team_certificate(cls, team: dict) -> str:
+        members = cls.format_members(team['members'])
+        rank = cls.format_rank(team['rank'])
+        return f'\\diplom{{{rank}}}{{{team["school"]}}}{{{members}}}'
+
+    @classmethod
+    def format_members_certificate(cls, team: dict) -> list[str]:
+        members: list[str] = team['members'].split(',')
+        rank = cls.format_rank(team['rank'])
+        return [f'\\diplom{{{rank}}}{{{member.strip()}}}{{}}' for member in members]
 
 
 class ImportFormView(FormView):

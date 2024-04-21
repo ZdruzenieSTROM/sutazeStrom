@@ -27,6 +27,11 @@ class Event(models.Model):
 
     def __str__(self):
         return f'{ self.get_name_display() } { self.date.year }'
+    
+    def save(self, *args, **kwargs):
+        if not self.frozen_results:
+            self.frozen_results = None
+        super().save(*args, **kwargs)
 
 
 class ProblemCategory(models.Model):

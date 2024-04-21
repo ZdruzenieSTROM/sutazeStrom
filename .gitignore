@@ -1,5 +1,6 @@
 __pycache__/
 .vscode/
+.idea
 */migrations/*
 !*/migrations/__init__.py
 db.sqlite3
@@ -8,4 +9,5 @@ sutazestrom-env/
 run.sh
 run.bat
 /static/
+venv/
 
