@@ -2,22 +2,22 @@ import csv
 import json
 from decimal import Decimal
 from operator import itemgetter
-from typing import Any, Dict
 
 from django.conf import settings
 from django.contrib import messages
 from django.core import management
-from django.db.models import Count, Q, Sum
-from django.http import FileResponse, HttpRequest, HttpResponse
+from django.core.exceptions import PermissionDenied
+from django.db.models import Sum
+from django.http import FileResponse, HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
-from django.views import View
 from django.views.generic import DetailView, FormView, ListView, View
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import FormView
 
 from .forms import ImportForm, InitializeForm, SubmitForm
 from .models import Event, ProblemCategory, Solution, Team
+
+# pylint: disable=attribute-defined-outside-init,unused-argument
 
 
 class SingleObjectFormView(FormView, SingleObjectMixin):
@@ -26,10 +26,10 @@ class SingleObjectFormView(FormView, SingleObjectMixin):
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        return super(SingleObjectFormView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
-        kwargs = super(SingleObjectFormView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
 
         if self.request.method in ('POST', 'PUT'):
             data = kwargs['data'].copy()
@@ -75,7 +75,7 @@ class InitializeView(FormView):
 
         messages.success(self.request, f'{ event } bol úspešne vytvorený!')
 
-        return super(InitializeView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class SubmitFormView(SingleObjectFormView):
@@ -92,7 +92,7 @@ class SubmitFormView(SingleObjectFormView):
         return reverse('competition:submit', kwargs={'pk': self.kwargs['pk']})
 
     def get_context_data(self, **kwargs):
-        context = super(SubmitFormView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
 
         context['solutions'] = Solution.objects.filter(
             team__event=self.object).order_by('-time')[:10]
@@ -109,14 +109,14 @@ class SubmitFormView(SingleObjectFormView):
             f'bola úspešne odovzdaná tímom { solution.team.name } '
             f'zo školy { solution.team.school }.')
 
-        return super(SubmitFormView, self).form_valid(form)
+        return super().form_valid(form)
 
     def form_invalid(self, form):
         data = form.data.copy()
         data['code'] = ''
         form.data = data
 
-        return super(SubmitFormView, self).form_invalid(form)
+        return super().form_invalid(form)
 
 
 class ResultsView(DetailView):
@@ -126,7 +126,7 @@ class ResultsView(DetailView):
     template_name = 'competition/results.html'
 
     def get_context_data(self, **kwargs):
-        context = super(ResultsView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['categories'], context['teams'] = generate_results(self.object)
         return context
 
@@ -138,16 +138,17 @@ class ResultsView(DetailView):
         return json.dumps(results)
 
     def post(self, request, pk):
-        if request.user.is_staff:
-            self.object = self.get_object()
-            # self.request.POST['freeze'] is always a string and even "False" evaluates to True
-            if self.request.POST['freeze'] == "True":
-                _, results = generate_results(self.object)
-                self.object.frozen_results = self.serialize_results(results)
-            else:
-                self.object.frozen_results = None
-            self.object.save()
-            return self.get(request, pk=pk)
+        if not request.user.is_staff:
+            raise PermissionDenied()
+        self.object: Event = self.get_object()
+        # self.request.POST['freeze'] is always a string and even "False" evaluates to True
+        if self.request.POST['freeze'] == "True":
+            _, results = generate_results(self.object)
+            self.object.frozen_results = self.serialize_results(results)
+        else:
+            self.object.frozen_results = None
+        self.object.save()
+        return self.get(request, pk=pk)
 
 
 class PublicResultsView(ResultsView):
@@ -207,7 +208,7 @@ class ImportFormView(FormView):
             f'Údaje boli úspešne importované. Počet tímov: { saved["teams"] },'
             f' počet účastníkov: { saved["participants"] }')
 
-        return super(ImportFormView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class StatisticsView(DetailView):
@@ -230,7 +231,8 @@ class StatisticsView(DetailView):
             for _ in range(number_of_teams):
                 stats.append([0]*category.problem_count)
             for solution in solutions:
-                # TODO: Tie operacie so 100 vyzeraju dost nebezpecne, to by mozno bolo dobre vytiahnut do osobitnych metod
+                # TODO: Tie operacie so 100 vyzeraju dost nebezpecne,
+                # to by mozno bolo dobre vytiahnut do osobitnych metod
                 stats[solution.team.number-100][solution.problem_position-1] = 1
 
             problem_statistics[category.name] = {

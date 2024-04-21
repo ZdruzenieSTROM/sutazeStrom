@@ -23,7 +23,7 @@ class SubmitForm(forms.Form):
     code = forms.CharField(max_length=6, label='', required=True)
 
     def __init__(self, *args, **kwargs):
-        super(SubmitForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['code'].widget.attrs.update({'class': 'form-control'})
 
     def clean_code(self):
@@ -32,8 +32,8 @@ class SubmitForm(forms.Form):
         try:
             code = list(map(int, self.cleaned_data['code']))
 
-        except ValueError:
-            raise forms.ValidationError('Nesprávny formát!')
+        except ValueError as exc:
+            raise forms.ValidationError('Nesprávny formát!') from exc
 
         if len(code) != 6 and (not require_control_sum and len(code) != 5):
             raise forms.ValidationError('Nesprávna dĺžka kódu!')
@@ -50,7 +50,7 @@ class SubmitForm(forms.Form):
         return reduce(lambda p, n: p*10 + n, code)
 
     def clean(self):
-        cleaned_data = super(SubmitForm, self).clean()
+        cleaned_data = super().clean()
 
         if self.errors:
             return cleaned_data
@@ -61,7 +61,7 @@ class SubmitForm(forms.Form):
         number, code_position = code // 100, code % 100
 
         if not code_position:
-            raise forms.ValidationError(f'Úlohy sú číslované od 1.')
+            raise forms.ValidationError('Úlohy sú číslované od 1.')
 
         categories = ProblemCategory.objects.filter(
             event=event).order_by("position")
@@ -84,9 +84,9 @@ class SubmitForm(forms.Form):
         try:
             team = Team.objects.get(event=event, number=number)
 
-        except Team.DoesNotExist:
+        except Team.DoesNotExist as exc:
             raise forms.ValidationError(
-                f'Číslo tímu { number } nezodpovedá registrovanému tímu!')
+                f'Číslo tímu { number } nezodpovedá registrovanému tímu!') from exc
 
         self.cleaned_data['team'] = team
 
@@ -115,29 +115,26 @@ class InitializeForm(forms.ModelForm):
         exclude = ('team_members', 'flat_compensation')
 
     def __init__(self, *args, **kwargs):
-        super(InitializeForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Vytvoriť'))
 
-    def save(self):
-        event = super(InitializeForm, self).save()
+    def save(self, commit=True):
+        event: Event = super().save(commit)
 
         event.flat_compensation = getattr(
             settings, f'{ event.name }_FLAT_COMPENSATION')
         event.team_members = getattr(settings, f'{ event.name }_TEAM_MEMBERS')
         event.save()
 
-        members = getattr(settings, f'{ event.name }_TEAM_MEMBERS')
         compensations = getattr(settings, f'{ event.name }_COMPENSATIONS')
-        school_class_mapper = getattr(
-            settings, f'{ event.name }_SCHOOL_CLASS_MAPPER')
         problem_categories = getattr(
             settings, f'{ event.name }_PROBLEM_CATEGORIES')
 
         for i, category_description in enumerate(problem_categories):
-            category = ProblemCategory.objects.create(
+            ProblemCategory.objects.create(
                 name=category_description['name'],
                 event=event, position=i,
                 points=category_description['points'],
@@ -165,7 +162,7 @@ class ImportForm(forms.Form):
         required=False, label='Ignorovať prvý záznam')
 
     def __init__(self, *args, **kwargs):
-        super(ImportForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.helper = FormHelper()
         self.helper.form_method = 'post'
@@ -181,7 +178,7 @@ class ImportForm(forms.Form):
         return csv_file
 
     def clean(self):
-        cleaned_data = super(ImportForm, self).clean()
+        cleaned_data = super().clean()
 
         if self.errors:
             return cleaned_data
@@ -197,7 +194,6 @@ class ImportForm(forms.Form):
         if csv_file and csv_text:
             raise forms.ValidationError('Vyber si len jeden zdroj údajov!')
 
-        fields = getattr(settings, f'{ event.name }_CSV_FIELDS')
         mapper = getattr(settings, f'{ event.name }_SCHOOL_CLASS_MAPPER')
 
         if not csv_text:
@@ -229,9 +225,9 @@ class ImportForm(forms.Form):
             try:
                 members = int(row['members'])
 
-            except ValueError:
+            except ValueError as exc:
                 raise forms.ValidationError(
-                    f'Počet členov v zázname { i } nie je platné číslo')
+                    f'Počet členov v zázname { i } nie je platné číslo') from exc
 
             if members > event.team_members:
                 raise forms.ValidationError(
@@ -252,17 +248,16 @@ class ImportForm(forms.Form):
                     compensation = Compensation.objects.get(
                         event=event, school_class=school_class)
 
-                except KeyError:
+                except KeyError as exc:
                     raise forms.ValidationError(
-                        'Účastník {} {} zo školy {} má neplatný ročník! (záznam {})'.format(
-                            row[f'participant{ j }_first_name'],
-                            row[f'participant{ j }_last_name'],
-                            row['school'], i))
-
-                except Compensation.DoesNotExist:
+                        f'Účastník '
+                        f'{row[f"participant{j}_first_name"]} {row[f"participant{j}_last_name"]} '
+                        f'zo školy {row["school"]} má neplatný ročník! (záznam {i})'
+                    ) from exc
+                except Compensation.DoesNotExist as exc:
                     raise forms.ValidationError(
-                        'Pre ročník {} ({}) nebola nájdená bonifikácia! (záznam {})'.format(
-                            row[f'{ prefix }_school_class'], school_class, i))
+                        f'Pre ročník {row[f"{ prefix }_school_class"]}'
+                        f'({school_class}) nebola nájdená bonifikácia! (záznam {i})') from exc
 
                 participants_to_save[i].append(Participant(
                     first_name=first_name,
@@ -285,7 +280,7 @@ class ImportForm(forms.Form):
                 participant.team = team
                 participant.save()
 
-        return {'teams': len(teams), 'participants': sum([len(p) for p in participants])}
+        return {'teams': len(teams), 'participants': sum(len(p) for p in participants)}
 
 
 def find_available_team_numbers(event, required):
