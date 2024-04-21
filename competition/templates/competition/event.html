@@ -12,6 +12,7 @@
   <a class="list-group-item list-group-item-action" href="{% url 'competition:csv_results' event.pk %}">Výsledky (CSV)</a>
   <a class="list-group-item list-group-item-action" href="{% url 'competition:statistics' event.pk %}">Štatistiky</a>
   <a class="list-group-item list-group-item-action" href="{% url 'competition:csv_statistics' event.pk %}">Štatistiky (CSV)</a>
+  <a class="list-group-item list-group-item-action" href="{% url 'competition:certificates' event.pk %}">Diplomy</a>
   {% if not event.started_at %}
   <form action="{% url 'competition:event' event.pk %}" method="POST">
     {% csrf_token %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event }}{% endblock %}
+
+{% block content %}
+<h1>{{ event }} - diplomy</h1>
+
+<h2>Tímové diplomy</h2>
+<div>
+    {% for certificate in team_certificates %}
+        {{certificate}} <br>
+    {% endfor %}
+</div>
+
+<h2>Diplomy pre jednotlivcov</h2>
+<div>
+    {% for team in members_certificates %}
+        {% for member_certificate in team %}
+            {{member_certificate}} <br>
+        {% endfor %}
+        <br>
+    {% endfor %}
+</div>
+{% endblock %}
