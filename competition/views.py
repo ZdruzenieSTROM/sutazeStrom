@@ -2,13 +2,13 @@ import csv
 import json
 from decimal import Decimal
 from operator import itemgetter
-from typing import Any, Dict, List
 
 from django.conf import settings
 from django.contrib import messages
 from django.core import management
-from django.db.models import Count, Q, Sum
-from django.http import FileResponse, HttpRequest, HttpResponse
+from django.core.exceptions import PermissionDenied
+from django.db.models import Sum
+from django.http import FileResponse, HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
 from django.views import View
@@ -19,6 +19,8 @@ from django.views.generic.edit import FormView
 from .forms import ImportForm, InitializeForm, SubmitForm
 from .models import Event, ProblemCategory, Solution, Team
 
+# pylint: disable=attribute-defined-outside-init,unused-argument
+
 
 class SingleObjectFormView(FormView, SingleObjectMixin):
     object_field_name = None
@@ -26,10 +28,10 @@ class SingleObjectFormView(FormView, SingleObjectMixin):
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        return super(SingleObjectFormView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
-        kwargs = super(SingleObjectFormView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
 
         if self.request.method in ('POST', 'PUT'):
             data = kwargs['data'].copy()
@@ -55,13 +57,13 @@ class EventDetailView(DetailView):
 
     template_name = 'competition/event.html'
 
-    def post(self,request,pk):
+    def post(self, request, pk):
         """Start event"""
         self.object = self.get_object()
         if self.object.started_at is None:
             self.object.started_at = now()
             self.object.save()
-        return self.get(request=request,pk=pk)
+        return self.get(request=request, pk=pk)
 
 
 class InitializeView(FormView):
@@ -75,7 +77,7 @@ class InitializeView(FormView):
 
         messages.success(self.request, f'{ event } bol úspešne vytvorený!')
 
-        return super(InitializeView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class SubmitFormView(SingleObjectFormView):
@@ -92,7 +94,7 @@ class SubmitFormView(SingleObjectFormView):
         return reverse('competition:submit', kwargs={'pk': self.kwargs['pk']})
 
     def get_context_data(self, **kwargs):
-        context = super(SubmitFormView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
 
         context['solutions'] = Solution.objects.filter(
             team__event=self.object).order_by('-time')[:10]
@@ -109,14 +111,14 @@ class SubmitFormView(SingleObjectFormView):
             f'bola úspešne odovzdaná tímom { solution.team.name } '
             f'zo školy { solution.team.school }.')
 
-        return super(SubmitFormView, self).form_valid(form)
+        return super().form_valid(form)
 
     def form_invalid(self, form):
         data = form.data.copy()
         data['code'] = ''
         form.data = data
 
-        return super(SubmitFormView, self).form_invalid(form)
+        return super().form_invalid(form)
 
 
 class ResultsView(DetailView):
@@ -126,35 +128,39 @@ class ResultsView(DetailView):
     template_name = 'competition/results.html'
 
     def get_context_data(self, **kwargs):
-        context = super(ResultsView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['categories'], context['teams'] = generate_results(self.object)
         return context
-    
-    def serialize_results(self,results):
+
+    def serialize_results(self, results):
         for team in results:
             team['compensation'] = str(team['compensation'])
             team['total_points'] = str(team['total_points'])
             team['problem_points'] = str(team['problem_points'])
         return json.dumps(results)
-    
-    def post(self,request,pk):
-        if request.user.is_staff:
-            self.object = self.get_object()
-            if self.request.POST['freeze'] == "True":  # self.request.POST['freeze'] is always a string and even "False" evaluates to True
-                _, results = generate_results(self.object)
-                self.object.frozen_results = self.serialize_results(results)
-            else:
-                self.object.frozen_results = None
-            self.object.save()
-            return self.get(request,pk=pk)
+
+    def post(self, request, pk):
+        if not request.user.is_staff:
+            raise PermissionDenied()
+        self.object: Event = self.get_object()
+        # self.request.POST['freeze'] is always a string and even "False" evaluates to True
+        if self.request.POST['freeze'] == "True":
+            _, results = generate_results(self.object)
+            self.object.frozen_results = self.serialize_results(results)
+        else:
+            self.object.frozen_results = None
+        self.object.save()
+        return self.get(request, pk=pk)
+
 
 class PublicResultsView(ResultsView):
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.object.frozen_results is not None:
             context['teams'] = json.loads(self.object.frozen_results)
         return context
+
 
 class CSVResultsView(View, SingleObjectMixin):
     model = Event
@@ -187,6 +193,7 @@ class CSVResultsView(View, SingleObjectMixin):
 
         return response
 
+
 class CertificatesView(DetailView):
     """Generovanie latex vstupu pre diplomy"""
     model = Event
@@ -202,34 +209,31 @@ class CertificatesView(DetailView):
         context['members_certificates'] = map(
             self.format_members_certificate, teams)
         return context
-    
-    @staticmethod 
-    def format_rank(rank:str)->str:
-        if isinstance(rank,str):
+
+    @staticmethod
+    def format_rank(rank: str) -> str:
+        if isinstance(rank, str):
             return rank.split('-')[0].strip()
         return rank
-    
-    @staticmethod 
-    def format_members(members:str)->str:
+
+    @staticmethod
+    def format_members(members: str) -> str:
         members = members.split(',')
-        if len(members)>1:
-           return ' \\& '.join([', '.join(members[:-1]), members[-1]])
+        if len(members) > 1:
+            return ' \\& '.join([', '.join(members[:-1]), members[-1]])
         return members
 
-
     @classmethod
-    def format_team_certificate(cls,team: dict) -> str:
+    def format_team_certificate(cls, team: dict) -> str:
         members = cls.format_members(team['members'])
         rank = cls.format_rank(team['rank'])
         return f'\\diplom{{{rank}}}{{{team["school"]}}}{{{members}}}'
 
     @classmethod
-    def format_members_certificate(cls,team: dict) -> List[str]:
-        members: List[str] = team['members'].split(',')
+    def format_members_certificate(cls, team: dict) -> list[str]:
+        members: list[str] = team['members'].split(',')
         rank = cls.format_rank(team['rank'])
         return [f'\\diplom{{{rank}}}{{{member.strip()}}}{{}}' for member in members]
-
-
 
 
 class ImportFormView(FormView):
@@ -248,8 +252,9 @@ class ImportFormView(FormView):
             f'Údaje boli úspešne importované. Počet tímov: { saved["teams"] },'
             f' počet účastníkov: { saved["participants"] }')
 
-        return super(ImportFormView, self).form_valid(form)
-    
+        return super().form_valid(form)
+
+
 class StatisticsView(DetailView):
     model = Event
     context_object_name = 'event'
@@ -257,29 +262,31 @@ class StatisticsView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
+
         categories = ProblemCategory.objects.filter(event=self.object).all()
         problem_statistics = {}
         for category in categories:
             solutions = Solution.objects.filter(
                 team__event=self.object,
                 problem_category=category
-                ).all()
+            ).all()
             number_of_teams = Team.objects.filter(event=self.object).count()
             stats = []
             for _ in range(number_of_teams):
                 stats.append([0]*category.problem_count)
             for solution in solutions:
-                # TODO: Tie operacie so 100 vyzeraju dost nebezpecne, to by mozno bolo dobre vytiahnut do osobitnych metod
+                # TODO: Tie operacie so 100 vyzeraju dost nebezpecne,
+                # to by mozno bolo dobre vytiahnut do osobitnych metod
                 stats[solution.team.number-100][solution.problem_position-1] = 1
 
             problem_statistics[category.name] = {
-                'stats':stats,
+                'stats': stats,
                 'problems': list(range(category.problem_count))
             }
         context['stats'] = problem_statistics
         context['number_of_teams'] = number_of_teams
         return context
+
 
 class StatisticsCsvExportView(StatisticsView):
     def get(self, request, *args, **kwargs):
@@ -290,18 +297,20 @@ class StatisticsCsvExportView(StatisticsView):
 
         writer = csv.writer(response, delimiter=settings.CSV_DELIMITER)
         joined_header = ['Číslo tímu']
-        joined_stats = [[]  for _ in range(context['number_of_teams'])]
-        for category_name,category_stats in context['stats'].items():
-            joined_header.extend([f'{category_name[:3]} {i+1}.' for i in category_stats['problems']])
-            for i,team_stats in enumerate(category_stats['stats']):
+        joined_stats = [[] for _ in range(context['number_of_teams'])]
+        for category_name, category_stats in context['stats'].items():
+            joined_header.extend(
+                [f'{category_name[:3]} {i+1}.' for i in category_stats['problems']])
+            for i, team_stats in enumerate(category_stats['stats']):
                 joined_stats[i].extend(team_stats)
 
         writer.writerow(joined_header)
-        for i,team in enumerate(joined_stats):
+        for i, team in enumerate(joined_stats):
             row = [i]
             row.extend(team)
             writer.writerow(row)
         return response
+
 
 class ExportView(View):
     def get(self, request):

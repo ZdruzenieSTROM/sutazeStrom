@@ -1,10 +1,12 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from django.urls import path
 
-from .views import (CertificatesView, CSVResultsView, EventDetailView,
-                    EventListView, ExportView, ImportFormView, InitializeView,
-                    PublicResultsView, ResultsView, StatisticsCsvExportView,
-                    StatisticsView, SubmitFormView)
+from competition.views import (CertificatesView, CSVResultsView,
+                               EventDetailView, EventListView, ExportView,
+                               ImportFormView, InitializeView,
+                               PublicResultsView, ResultsView,
+                               StatisticsCsvExportView, StatisticsView,
+                               SubmitFormView)
 
 app_name = 'competition'
 
@@ -15,7 +17,8 @@ urlpatterns = [
          staff_member_required(SubmitFormView.as_view()), name='submit'),
     path('<int:pk>/results/',
          staff_member_required(ResultsView.as_view()), name='results'),
-    path('<int:pk>/priebezne-vysledky',PublicResultsView.as_view(),name='public-results'),
+    path('<int:pk>/priebezne-vysledky',
+         PublicResultsView.as_view(), name='public-results'),
     path('<int:pk>/csvresults/',
          staff_member_required(CSVResultsView.as_view()), name='csv_results'),
     path('<int:pk>/statistics/',
@@ -25,7 +28,7 @@ urlpatterns = [
     path('initialize', staff_member_required(
         InitializeView.as_view()), name='initialize'),
     path('<int:pk>/diplomy',
-         staff_member_required(CertificatesView.as_view()),name='certificates'),
+         staff_member_required(CertificatesView.as_view()), name='certificates'),
     path('import/', staff_member_required(ImportFormView.as_view()), name='import'),
     path('export/', staff_member_required(ExportView.as_view()), name='export'),
 ]
