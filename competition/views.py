@@ -1,6 +1,6 @@
 import csv
-from decimal import Decimal
 import json
+from decimal import Decimal
 from operator import itemgetter
 from typing import Any, Dict
 
@@ -10,11 +10,11 @@ from django.core import management
 from django.db.models import Count, Q, Sum
 from django.http import FileResponse, HttpRequest, HttpResponse
 from django.urls import reverse, reverse_lazy
+from django.utils.timezone import now
 from django.views import View
 from django.views.generic import DetailView, FormView, ListView, View
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormView
-from django.utils.timezone import now
 
 from .forms import ImportForm, InitializeForm, SubmitForm
 from .models import Event, ProblemCategory, Solution, Team
@@ -55,13 +55,13 @@ class EventDetailView(DetailView):
 
     template_name = 'competition/event.html'
 
-    def post(self,request,pk):
+    def post(self, request, pk):
         """Start event"""
         self.object = self.get_object()
         if self.object.started_at is None:
             self.object.started_at = now()
             self.object.save()
-        return self.get(request=request,pk=pk)
+        return self.get(request=request, pk=pk)
 
 
 class InitializeView(FormView):
@@ -129,32 +129,35 @@ class ResultsView(DetailView):
         context = super(ResultsView, self).get_context_data(**kwargs)
         context['categories'], context['teams'] = generate_results(self.object)
         return context
-    
-    def serialize_results(self,results):
+
+    def serialize_results(self, results):
         for team in results:
             team['compensation'] = str(team['compensation'])
             team['total_points'] = str(team['total_points'])
             team['problem_points'] = str(team['problem_points'])
         return json.dumps(results)
-    
-    def post(self,request,pk):
+
+    def post(self, request, pk):
         if request.user.is_staff:
             self.object = self.get_object()
-            if self.request.POST['freeze'] == "True":  # self.request.POST['freeze'] is always a string and even "False" evaluates to True
+            # self.request.POST['freeze'] is always a string and even "False" evaluates to True
+            if self.request.POST['freeze'] == "True":
                 _, results = generate_results(self.object)
                 self.object.frozen_results = self.serialize_results(results)
             else:
                 self.object.frozen_results = None
             self.object.save()
-            return self.get(request,pk=pk)
+            return self.get(request, pk=pk)
+
 
 class PublicResultsView(ResultsView):
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.object.frozen_results is not None:
             context['teams'] = json.loads(self.object.frozen_results)
         return context
+
 
 class CSVResultsView(View, SingleObjectMixin):
     model = Event
@@ -205,7 +208,8 @@ class ImportFormView(FormView):
             f' počet účastníkov: { saved["participants"] }')
 
         return super(ImportFormView, self).form_valid(form)
-    
+
+
 class StatisticsView(DetailView):
     model = Event
     context_object_name = 'event'
@@ -213,14 +217,14 @@ class StatisticsView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
+
         categories = ProblemCategory.objects.filter(event=self.object).all()
         problem_statistics = {}
         for category in categories:
             solutions = Solution.objects.filter(
                 team__event=self.object,
                 problem_category=category
-                ).all()
+            ).all()
             number_of_teams = Team.objects.filter(event=self.object).count()
             stats = []
             for _ in range(number_of_teams):
@@ -230,12 +234,13 @@ class StatisticsView(DetailView):
                 stats[solution.team.number-100][solution.problem_position-1] = 1
 
             problem_statistics[category.name] = {
-                'stats':stats,
+                'stats': stats,
                 'problems': list(range(category.problem_count))
             }
         context['stats'] = problem_statistics
         context['number_of_teams'] = number_of_teams
         return context
+
 
 class StatisticsCsvExportView(StatisticsView):
     def get(self, request, *args, **kwargs):
@@ -246,18 +251,20 @@ class StatisticsCsvExportView(StatisticsView):
 
         writer = csv.writer(response, delimiter=settings.CSV_DELIMITER)
         joined_header = ['Číslo tímu']
-        joined_stats = [[]  for _ in range(context['number_of_teams'])]
-        for category_name,category_stats in context['stats'].items():
-            joined_header.extend([f'{category_name[:3]} {i+1}.' for i in category_stats['problems']])
-            for i,team_stats in enumerate(category_stats['stats']):
+        joined_stats = [[] for _ in range(context['number_of_teams'])]
+        for category_name, category_stats in context['stats'].items():
+            joined_header.extend(
+                [f'{category_name[:3]} {i+1}.' for i in category_stats['problems']])
+            for i, team_stats in enumerate(category_stats['stats']):
                 joined_stats[i].extend(team_stats)
 
         writer.writerow(joined_header)
-        for i,team in enumerate(joined_stats):
+        for i, team in enumerate(joined_stats):
             row = [i]
             row.extend(team)
             writer.writerow(row)
         return response
+
 
 class ExportView(View):
     def get(self, request):

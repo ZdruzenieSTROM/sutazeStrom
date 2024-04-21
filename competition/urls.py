@@ -2,8 +2,9 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.urls import path
 
 from .views import (CSVResultsView, EventDetailView, EventListView, ExportView,
-                    ImportFormView, InitializeView, ResultsView, PublicResultsView,
-                    StatisticsCsvExportView, StatisticsView, SubmitFormView)
+                    ImportFormView, InitializeView, PublicResultsView,
+                    ResultsView, StatisticsCsvExportView, StatisticsView,
+                    SubmitFormView)
 
 app_name = 'competition'
 
@@ -14,7 +15,8 @@ urlpatterns = [
          staff_member_required(SubmitFormView.as_view()), name='submit'),
     path('<int:pk>/results/',
          staff_member_required(ResultsView.as_view()), name='results'),
-    path('<int:pk>/priebezne-vysledky',PublicResultsView.as_view(),name='public-results'),
+    path('<int:pk>/priebezne-vysledky',
+         PublicResultsView.as_view(), name='public-results'),
     path('<int:pk>/csvresults/',
          staff_member_required(CSVResultsView.as_view()), name='csv_results'),
     path('<int:pk>/statistics/',
