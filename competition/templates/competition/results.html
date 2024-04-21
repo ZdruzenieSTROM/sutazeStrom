@@ -16,8 +16,11 @@
 
 
 {% block content %}
-
+{% if event.started_at %}
 Do konca zostáva: <div id="countdown" class="countdown"></div>
+{% else %}
+Súťaž ešte nezačala
+{% endif %}
 {% if request.user.is_staff %}
   <div class="row">
     <form action="{% url 'competition:results' event.pk %}" method="POST" class="m-2">

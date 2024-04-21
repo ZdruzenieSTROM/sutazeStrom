@@ -20,6 +20,8 @@ class Event(models.Model):
     started_at = models.DateTimeField(null=True,blank=True)
 
     def end_time(self):
+        if self.started_at is None:
+            return None
         return self.started_at + self.length
 
     def __str__(self):
