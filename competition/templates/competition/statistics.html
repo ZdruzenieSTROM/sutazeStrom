@@ -14,7 +14,7 @@
         </tr>
     {% for team in category_stats.stats %}
         <tr>
-            <td>{{forloop.counter|add:100}}.</td>
+            <td>{{forloop.counter0|add:100}}.</td>
         {% for problem in team %}
             <td class="{% if problem %}statistics__cell--success{% else %}statistics__cell--fail{% endif %}">{{problem}}</td>
         {% endfor %}
