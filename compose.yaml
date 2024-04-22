@@ -1,0 +1,26 @@
+version: "3.3"
+
+services:
+  website:
+    build: .
+    ports:
+      - "8720:8000"
+    volumes:
+      - "staticfiles:/app/static:ro"
+      - type: "bind"
+        source: "./db.sqlite3"
+        target: "/app/db.sqlite3"
+    restart: always
+
+  static:
+    image: "nginx:1.23"
+    depends_on:
+      - "website"
+    ports:
+      - "8721:80"
+    volumes:
+      - "staticfiles:/usr/share/nginx/html:ro"
+    restart: always
+
+volumes:
+  staticfiles:
