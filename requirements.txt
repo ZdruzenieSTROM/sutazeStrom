@@ -6,3 +6,4 @@ typing_extensions==4.11.0
 tzdata==2024.1
 pylint==3.1.0
 pylint_django==2.5.5
+crispy_bootstrap4==2024.1
