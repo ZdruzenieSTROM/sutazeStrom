@@ -1,13 +1,10 @@
 import csv
 import json
-from decimal import Decimal
-from operator import itemgetter
 
 from django.conf import settings
 from django.contrib import messages
 from django.core import management
 from django.core.exceptions import PermissionDenied
-from django.db.models import Sum
 from django.http import FileResponse, HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
@@ -18,6 +15,7 @@ from django.views.generic.edit import FormView
 
 from .forms import ImportForm, InitializeForm, SubmitForm
 from .models import Event, ProblemCategory, Solution, Team
+from .results import generate_results
 
 # pylint: disable=attribute-defined-outside-init,unused-argument
 
@@ -317,87 +315,3 @@ class ExportView(View):
         management.call_command('dumpdata', format='json', output='db.json')
 
         return FileResponse(open('db.json', 'rb'), as_attachment=True)
-
-
-def generate_results(event):
-    categories = ProblemCategory.objects.filter(
-        event=event).order_by('position')
-
-    # Pull information about teams from database
-    # TODO: use annotate instead of pulling data into a dictionary
-    teams = [
-        {
-            'name': team.name,
-            'school': team.school,
-            'members': ', '.join([
-                f'{ member.first_name } { member.last_name }'
-                for member in team.participant_set.order_by('last_name', 'first_name')
-            ]),
-            **team.participant_set.aggregate(compensation=Sum('compensation__points')),
-            'solved_by_category': [
-                team.solution_set.filter(problem_category=category).count()
-                for category in categories
-            ],
-            'total_points': Decimal(0),
-            'problem_points': Decimal(0),
-            'solved_problems': 0,
-        } for team in Team.objects.filter(event=event)
-    ]
-
-    # Compute points
-
-    for team in teams:
-        for count, category in zip(team['solved_by_category'], categories):
-            if category.multiplicative_compensation:
-                category_points = count * \
-                    category.points*team['compensation']
-            else:
-                category_points = count * \
-                    category.points
-
-            team['total_points'] += category_points
-
-            if category.is_problem:
-                team['solved_problems'] += count
-                team['problem_points'] += category_points
-
-        if event.flat_compensation:
-            team['total_points'] += team['compensation']
-
-    # Sort teams
-    if event.name == 'LOMIHLAV':
-        team_key = itemgetter('total_points', 'solved_problems')
-    else:
-        team_key = itemgetter('total_points', 'problem_points')
-
-    teams.sort(key=team_key, reverse=True)
-
-    # Generate ranks
-    def save_team_ranks(teams, lower_rank):
-        upper_rank = lower_rank + len(teams) - 1
-
-        if len(teams) == 1:
-            teams[0]['rank'] = lower_rank
-        else:
-            for team_to_rank in teams:
-                team_to_rank['rank'] = f'{ lower_rank } - { upper_rank }'
-
-        return upper_rank
-
-    lower_rank = 1
-    identically_ranked_teams = []
-
-    for team in teams:
-        if not identically_ranked_teams or\
-                team_key(team) == team_key(identically_ranked_teams[-1]):
-            identically_ranked_teams.append(team)
-        else:
-            lower_rank = save_team_ranks(
-                identically_ranked_teams, lower_rank) + 1
-
-            identically_ranked_teams.clear()
-            identically_ranked_teams.append(team)
-
-    save_team_ranks(identically_ranked_teams, lower_rank)
-
-    return (categories, teams)
