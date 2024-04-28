@@ -1,11 +1,13 @@
 import csv
 import json
+from functools import wraps
 
 from django.conf import settings
 from django.contrib import messages
 from django.core import management
 from django.core.exceptions import PermissionDenied
 from django.http import FileResponse, HttpResponse
+from django.http.response import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
 from django.views import View
@@ -18,6 +20,18 @@ from .models import Event, ProblemCategory, Solution, Team
 from .results import generate_results
 
 # pylint: disable=attribute-defined-outside-init,unused-argument
+
+
+def nonstaff_redirect_to_public_results(view_func):
+    def decorator(view_func):
+        @wraps(view_func)
+        def _wrapper_view(request, *args, **kwargs):
+            if request.user.is_staff:
+                return view_func(request, *args, **kwargs)
+            return HttpResponseRedirect(reverse('competition:public-results-latest'))
+
+        return _wrapper_view
+    return decorator(view_func)
 
 
 class SingleObjectFormView(FormView, SingleObjectMixin):
@@ -158,6 +172,11 @@ class PublicResultsView(ResultsView):
         if self.object.frozen_results is not None:
             context['teams'] = json.loads(self.object.frozen_results)
         return context
+
+
+class LatestPublicResultsView(ResultsView):
+    def get_object(self):
+        return Event.objects.latest()
 
 
 class CSVResultsView(View, SingleObjectMixin):

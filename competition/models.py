@@ -3,6 +3,11 @@ from django.db import models
 
 
 class Event(models.Model):
+    class Meta:
+        verbose_name = 'Súťaž'
+        verbose_name_plural = 'Súťaže'
+        get_latest_by = 'date'
+
     EVENT_NAME_CHOICES = (
         ('LOMIHLAV', 'Lomihlav'),
         ('MAMUT', 'Mamut'),
