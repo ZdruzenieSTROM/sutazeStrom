@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.core import management
 from django.core.exceptions import PermissionDenied
 from django.http import FileResponse, HttpResponse
-from django.http.response import HttpResponseRedirect
+from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
 from django.views import View
@@ -28,10 +28,15 @@ def nonstaff_redirect_to_public_results(view_func):
         def _wrapper_view(request, *args, **kwargs):
             if request.user.is_staff:
                 return view_func(request, *args, **kwargs)
-            return HttpResponseRedirect(reverse('competition:public-results-latest'))
+            return redirect('competition:public-results-latest')
 
         return _wrapper_view
     return decorator(view_func)
+
+
+def view_404(request, exception=None):  # pylint: disable=unused-argument
+    """Presmerovanie 404 na homepage"""
+    return redirect('competition:public-results-latest')
 
 
 class SingleObjectFormView(FormView, SingleObjectMixin):
