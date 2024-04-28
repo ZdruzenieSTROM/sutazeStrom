@@ -1,6 +1,6 @@
 FROM python:3.10
 
-ARG SETTINGS_MODULE=submitter.settings
+ARG SETTINGS_MODULE=submitter.settings.prod_settings
 
 EXPOSE 8000
 
