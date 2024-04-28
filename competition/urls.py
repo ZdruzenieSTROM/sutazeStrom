@@ -1,34 +1,40 @@
-from django.contrib.admin.views.decorators import staff_member_required
+
+
 from django.urls import path
 
 from competition.views import (CertificatesView, CSVResultsView,
                                EventDetailView, EventListView, ExportView,
                                ImportFormView, InitializeView,
-                               PublicResultsView, ResultsView,
-                               StatisticsCsvExportView, StatisticsView,
-                               SubmitFormView)
+                               LatestPublicResultsView, PublicResultsView,
+                               ResultsView, StatisticsCsvExportView,
+                               StatisticsView, SubmitFormView,
+                               nonstaff_redirect_to_public_results)
 
 app_name = 'competition'
 
+
 urlpatterns = [
-    path('', staff_member_required(EventListView.as_view()), name='index'),
-    path('<int:pk>/', staff_member_required(EventDetailView.as_view()), name='event'),
+    path('', nonstaff_redirect_to_public_results(
+        EventListView.as_view()), name='index'),
+    path('<int:pk>/', nonstaff_redirect_to_public_results(EventDetailView.as_view()), name='event'),
     path('<int:pk>/submit/',
-         staff_member_required(SubmitFormView.as_view()), name='submit'),
+         nonstaff_redirect_to_public_results(SubmitFormView.as_view()), name='submit'),
     path('<int:pk>/results/',
-         staff_member_required(ResultsView.as_view()), name='results'),
+         nonstaff_redirect_to_public_results(ResultsView.as_view()), name='results'),
+    path('priebezne-vysledky',
+         LatestPublicResultsView.as_view(), name='public-results-latest'),
     path('<int:pk>/priebezne-vysledky',
          PublicResultsView.as_view(), name='public-results'),
     path('<int:pk>/csvresults/',
-         staff_member_required(CSVResultsView.as_view()), name='csv_results'),
+         nonstaff_redirect_to_public_results(CSVResultsView.as_view()), name='csv_results'),
     path('<int:pk>/statistics/',
-         staff_member_required(StatisticsView.as_view()), name='statistics'),
+         nonstaff_redirect_to_public_results(StatisticsView.as_view()), name='statistics'),
     path('<int:pk>/csvstatistics/',
-         staff_member_required(StatisticsCsvExportView.as_view()), name='csv_statistics'),
-    path('initialize', staff_member_required(
+         nonstaff_redirect_to_public_results(StatisticsCsvExportView.as_view()), name='csv_statistics'),
+    path('initialize', nonstaff_redirect_to_public_results(
         InitializeView.as_view()), name='initialize'),
     path('<int:pk>/diplomy',
-         staff_member_required(CertificatesView.as_view()), name='certificates'),
-    path('import/', staff_member_required(ImportFormView.as_view()), name='import'),
-    path('export/', staff_member_required(ExportView.as_view()), name='export'),
+         nonstaff_redirect_to_public_results(CertificatesView.as_view()), name='certificates'),
+    path('import/', nonstaff_redirect_to_public_results(ImportFormView.as_view()), name='import'),
+    path('export/', nonstaff_redirect_to_public_results(ExportView.as_view()), name='export'),
 ]

@@ -5,3 +5,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('competition.urls')),
 ]
+
+handler404 = 'competition.views.view_404'
