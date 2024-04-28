@@ -10,4 +10,6 @@ run.sh
 run.bat
 /static/
 venv/
+.secrets/*
+!.secrets/.gitkeep
 
