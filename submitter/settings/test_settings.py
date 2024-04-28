@@ -1,18 +1,25 @@
 import os
+from pathlib import Path
 
 from django.contrib import messages
 
-from submitter.event_config import *
+from submitter.event_config import *  # pylint:disable=wildcard-import
+
+
+def read_secret(secret_name: str) -> str:
+    with open(os.path.join(BASE_DIR, '.secrets', secret_name), 'r', encoding='utf-8') as secret_file:
+        return secret_file.readline()
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '=p&ptuj_=+t9xasscjh_arab!&iot^9t1=l36^v3asn%_o-i^g'
+SECRET_KEY = read_secret('django_secret_key.txt')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -141,3 +148,16 @@ MESSAGE_TAGS = {
 # Crispy forms
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+
+####### Email ################
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = '587'
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'noreply@strom.sk'
+SERVER_EMAIL = 'noreply@strom.sk'
+EMAIL_HOST_PASSWORD = read_secret('email_password.txt')
+DEFAULT_FROM_EMAIL = 'noreply@strom.sk'
+
+ADMINS = [('Kovacs', 'kovacs@strom.sk'), ('Masrna', 'michal.masrna@strom.sk')]
