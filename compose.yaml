@@ -6,7 +6,7 @@ services:
     ports:
       - "8720:8000"
     volumes:
-      - "staticfiles:/app/static:ro"
+      - "staticfiles:/app/static"
       - type: "bind"
         source: "./db.sqlite3"
         target: "/app/db.sqlite3"
