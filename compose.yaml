@@ -8,8 +8,11 @@ services:
     volumes:
       - "staticfiles:/app/static"
       - type: "bind"
-        source: "./db.sqlite3"
+        source: "/data/www/sutazeStrom/db.sqlite3"
         target: "/app/db.sqlite3"
+      - type: "bind"
+        source: "/data/www/sutazeStrom/.secrets"
+        target: "/app/.secrets"
     restart: always
 
   static:
