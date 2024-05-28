@@ -24,7 +24,18 @@ SECRET_KEY = read_secret('django_secret_key.txt')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['mamut.strom.sk',
+                 'lomihlav.strom.sk', 'localhost']
+
+CSRF_TRUSTED_ORIGINS = ['https://mamut.strom.sk',
+                        'https://www.mamut.strom.sk',
+                        'http://mamut.strom.sk',
+                        'http://www.mamut.strom.sk',
+                        'https://lomihlav.strom.sk',
+                        'https://www.lomihlav.strom.sk',
+                        'http://lomihlav.strom.sk',
+                        'http://www.lomihlav.strom.sk'
+                        ]
 
 
 # Application definition
