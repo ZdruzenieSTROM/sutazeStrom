@@ -5,7 +5,7 @@ Webová platforma na zabezpečenie chodu jednodňových súžaží organizovaný
 ## Requirements installation
 
  - Python (3 or later, version 3.10.0 recommended)
- - Django (version 4.0)
+ - Django (version 4.2)
  - virtual enviroment
 
 ### Windows machine
@@ -19,9 +19,6 @@ In Bash type:
 
 ```bash
 sudo apt install pip
-```
-```bash
-python3 -m pip install Django==2.0
 ```
 ```bash
 python3 -m pip install virtualenv
@@ -39,6 +36,7 @@ Create virtual enviroment
 ```cmd
 py -m venv ENV_NAME
 ```
+where `ENV_NAME` is your desired name for the newly created virtual environment, e. g. `venv`.
 Perhaps, you will need to allow remote access in your firewall.
 
 ### Linux machine
@@ -54,7 +52,7 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-and allow remote access for desired port:
+and allow remote access for desired `PORT_NUMBER` (e. g. 8080):
 ```bash
 iptables -I INPUT -p tcp -m tcp --dport PORT_NUMBER -j ACCEPT
 ```
