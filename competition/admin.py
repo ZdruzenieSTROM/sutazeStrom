@@ -21,7 +21,13 @@ class TeamAdmin(admin.ModelAdmin):
         model = Participant
         extra = 0
 
-    readonly_fields = ('number',)
+    def get_readonly_fields(self, request, obj=None):
+        # Number is read-only after creation, but can be entered during
+        # creation (obj is None).
+        if obj:
+            return ["number"]
+        else:
+            return []
     inlines = (ParticipantInline,)
 
     search_fields = ('name', 'school', 'number',)
