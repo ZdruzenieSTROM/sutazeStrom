@@ -33,7 +33,15 @@ class SubmitForm(forms.Form):
             code = list(map(int, self.cleaned_data['code']))
 
         except ValueError as exc:
-            raise forms.ValidationError('Nesprávny formát!') from exc
+            slovak_keyboard = True
+            for char in self.cleaned_data['code']:
+                if char not in {"+", "ľ", "š", "č", "ť", "ž", "ý", "á", "í", "é"}:
+                    slovak_keyboard = False
+                    break
+            if slovak_keyboard:
+                raise forms.ValidationError('Nesprávny formát! Skontroluj, či máš nastavenú anglickú klávesnicu.') from exc
+            else:
+                raise forms.ValidationError('Nesprávny formát!') from exc
 
         if len(code) != 6 and (not require_control_sum and len(code) != 5):
             raise forms.ValidationError('Nesprávna dĺžka kódu!')
