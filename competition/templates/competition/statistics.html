@@ -14,7 +14,7 @@
         </tr>
     {% for id, team in category_stats.stats.items %}
         <tr>
-            <td>{{id}}.</td>
+            <td>{{id}}</td>
         {% for problem in team %}
             <td class="{% if problem %}statistics__cell--success{% else %}statistics__cell--fail{% endif %}">{{problem}}</td>
         {% endfor %}
