@@ -35,9 +35,10 @@ class SubmitForm(forms.Form):
         except ValueError as exc:
             for char in self.cleaned_data['code']:
                 if char not in {"+", "ľ", "š", "č", "ť", "ž", "ý", "á", "í", "é"}:
-                    raise forms.ValidationError('Nesprávny formát!') from exc
+                    raise forms.ValidationError(
+                        'Nesprávny formát! Kód môže obsahovať iba číslice.') from exc
             raise forms.ValidationError(
-                'Nesprávny formát! Skontroluj, či máš nastavenú anglickú klávesnicu.') from exc
+                'Nesprávny formát! Zrejme máš nastavenú slovenskú klávesnicu, a tak miesto čísel zadávaš písmená s diakritikov. Prepni si klávesnicu na anglickú a vyskúšaj kód naskenovať ešte raz.') from exc
 
         if len(code) != 6 and (not require_control_sum and len(code) != 5):
             raise forms.ValidationError('Nesprávna dĺžka kódu!')
