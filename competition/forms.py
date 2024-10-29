@@ -34,7 +34,9 @@ class SubmitForm(forms.Form):
 
         except ValueError as exc:
             for char in self.cleaned_data['code']:
-                if char not in {"+", "ľ", "š", "č", "ť", "ž", "ý", "á", "í", "é"}:
+                SLOVAK_DIGIT_EQUIVALENTS = {
+                    "+", "ľ", "š", "č", "ť", "ž", "ý", "á", "í", "é"}
+                if char not in SLOVAK_DIGIT_EQUIVALENTS:
                     raise forms.ValidationError(
                         'Nesprávny formát! Kód môže obsahovať iba číslice.') from exc
             raise forms.ValidationError(
