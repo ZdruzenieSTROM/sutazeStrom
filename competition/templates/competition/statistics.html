@@ -12,9 +12,9 @@
             <th>{{problem|add:1}}.</th>
         {% endfor %}
         </tr>
-    {% for id, team in category_stats.stats.items %}
+    {% for team_number, team in category_stats.stats.items %}
         <tr>
-            <td>{{id}}</td>
+            <td>{{team_number}}</td>
         {% for problem in team %}
             <td class="{% if problem %}statistics__cell--success{% else %}statistics__cell--fail{% endif %}">{{problem}}</td>
         {% endfor %}
