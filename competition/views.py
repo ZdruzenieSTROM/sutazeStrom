@@ -292,21 +292,18 @@ class StatisticsView(DetailView):
                 team__event=self.object,
                 problem_category=category
             ).all()
-            number_of_teams = Team.objects.filter(event=self.object).count()
-            stats = []
-            for _ in range(number_of_teams):
-                stats.append([0]*category.problem_count)
+            teams = Team.objects.filter(event=self.object)
+            stats = {}
+            for team in teams:
+                stats[team.number] = [0]*category.problem_count
             for solution in solutions:
-                # TODO: Tie operacie so 100 vyzeraju dost nebezpecne,
-                # to by mozno bolo dobre vytiahnut do osobitnych metod
-                stats[solution.team.number-100][solution.problem_position-1] = 1
+                stats[solution.team.number][solution.problem_position-1] = 1
 
             problem_statistics[category.name] = {
                 'stats': stats,
                 'problems': list(range(category.problem_count))
             }
         context['stats'] = problem_statistics
-        context['number_of_teams'] = number_of_teams
         return context
 
 
