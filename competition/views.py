@@ -15,6 +15,8 @@ from django.views.generic import DetailView, FormView, ListView, View
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormView
 
+from datetime import timedelta
+
 from .forms import ImportForm, InitializeForm, SubmitForm
 from .models import Event, ProblemCategory, Solution, Team
 from .results import generate_results
@@ -154,6 +156,8 @@ class ResultsView(DetailView):
             team['compensation'] = str(team['compensation'])
             team['total_points'] = str(team['total_points'])
             team['problem_points'] = str(team['problem_points'])
+            if team['spare_time'] is not None:
+                team['spare_time'] = team['spare_time'].total_seconds()
         return json.dumps(results)
 
     def post(self, request, pk):
@@ -176,6 +180,9 @@ class PublicResultsView(ResultsView):
         context = super().get_context_data(**kwargs)
         if self.object.frozen_results is not None:
             context['teams'] = json.loads(self.object.frozen_results)
+            for team in context['teams']:
+                if team['spare_time'] is not None:
+                    team['spare_time'] = timedelta(seconds=team['spare_time'])
         return context
 
 
