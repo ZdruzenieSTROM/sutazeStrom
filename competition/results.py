@@ -24,7 +24,7 @@ def build_team_dict(team: Team, event: Event, categories: BaseManager[ProblemCat
         'name': team.name,
         'school': team.school,
         'members': ', '.join([
-            f'{ member.first_name } { member.last_name } ({ member.compensation.school_class })'
+            f'{ member.first_name } { member.last_name }'
             for member in team.participant_set.order_by('last_name', 'first_name')
         ]),
         **team.participant_set.aggregate(compensation=Sum('compensation__points')),
