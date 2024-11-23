@@ -22,8 +22,10 @@ class Event(models.Model):
         null=True, blank=True, verbose_name='Zmrznutá výsledkovka')
     team_members = models.PositiveSmallIntegerField(null=True)
     flat_compensation = models.BooleanField(null=True)
-    length = models.DurationField(verbose_name='Trvanie súťaže')
-    started_at = models.DateTimeField(null=True, blank=True)
+    length = models.DurationField(verbose_name='Trvanie súťaže',
+                                  help_text='Formát: HH:MM:SS')
+    started_at = models.DateTimeField(null=True, blank=True,
+                                      help_text='Formát: RRRR-MM-DD-HH:MM:SS')
 
     def end_time(self):
         if self.started_at is None:
