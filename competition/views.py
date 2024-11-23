@@ -323,15 +323,15 @@ class StatisticsCsvExportView(StatisticsView):
 
         writer = csv.writer(response, delimiter=settings.CSV_DELIMITER)
         joined_header = ['Číslo tímu']
-        joined_stats = [[] for _ in range(context['number_of_teams'])]
+        joined_stats = {}
         for category_name, category_stats in context['stats'].items():
             joined_header.extend(
                 [f'{category_name[:3]} {i+1}.' for i in category_stats['problems']])
-            for i, team_stats in enumerate(category_stats['stats']):
-                joined_stats[i].extend(team_stats)
+            for i, team_stats in category_stats['stats'].items():
+                joined_stats[i] = joined_stats.get(i, []) + team_stats
 
         writer.writerow(joined_header)
-        for i, team in enumerate(joined_stats):
+        for i, team in joined_stats.items():
             row = [i]
             row.extend(team)
             writer.writerow(row)
