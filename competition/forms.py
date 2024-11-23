@@ -163,8 +163,12 @@ class ImportForm(forms.Form):
 
     help_text = '''názov;škola;počet členov;meno;priezvisko;ročník 
                 (meno;priezvisko;ročník znova, podľa počtu členov) 
-                (ročník v tvare napríklad 4)'''
-    csv_text = forms.CharField(widget=forms.Textarea, required=False, label='', help_text=help_text)
+                (ročník v tvare napríklad 4)\n
+                
+                napr. pre 5 členný tím:
+                Gumkaci;Gymnázium Alejová 1, Košice;5;Janko;Hraško;4;Mária;Králiková;5;Peter;Králik;6;Jana;Králiková;4;Marek;Králik;4'''
+    csv_text = forms.CharField(
+        widget=forms.Textarea, required=False, label='', help_text=help_text)
     csv_file = forms.FileField(required=False, label='')
 
     ignore_first_entry = forms.BooleanField(
