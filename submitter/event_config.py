@@ -4,10 +4,13 @@ LOMIHLAV_TEAM_MEMBERS = 4
 LOMIHLAV_FLAT_COMPENSATION = False
 
 LOMIHLAV_SCHOOL_CLASS_MAPPER = {
+    '7': 7,
     'siedmy': 7,
     'sekunda': 7,
+    '8': 8,
     'ôsmy': 8,
     'tercia': 8,
+    '9': 9,
     'deviaty': 9,
     'kvarta': 9,
 }
@@ -51,8 +54,11 @@ MAMUT_CSV_FIELDS = [
 
 MAMUT_SCHOOL_CLASS_MAPPER = {
     '4. ročník ZŠ': 4,
+    '4': 4,
     '5. ročník ZŠ': 5,
+    '5': 5,
     '6. ročník ZŠ/Prima': 6,
+    '6': 6,
 }
 
 MAMUT_PROBLEM_CATEGORIES = [

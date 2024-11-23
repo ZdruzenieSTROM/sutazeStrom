@@ -161,7 +161,10 @@ class ImportForm(forms.Form):
     event = forms.ModelChoiceField(
         queryset=Event.objects.all(), label='Vyber súťaž')
 
-    csv_text = forms.CharField(widget=forms.Textarea, required=False, label='')
+    help_text = '''názov;škola;počet členov;meno;priezvisko;ročník 
+                (meno;priezvisko;ročník znova, podľa počtu členov) 
+                (ročník v tvare napríklad 4)'''
+    csv_text = forms.CharField(widget=forms.Textarea, required=False, label='', help_text=help_text)
     csv_file = forms.FileField(required=False, label='')
 
     ignore_first_entry = forms.BooleanField(
