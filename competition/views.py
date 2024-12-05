@@ -149,6 +149,7 @@ class ResultsView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'], context['teams'] = generate_results(self.object)
+        context['is_public'] = False
         return context
 
     def serialize_results(self, results):
@@ -183,6 +184,7 @@ class PublicResultsView(ResultsView):
             for team in context['teams']:
                 if team['spare_time'] is not None:
                     team['spare_time'] = timedelta(seconds=team['spare_time'])
+        context['is_public'] = True
         return context
 
 
