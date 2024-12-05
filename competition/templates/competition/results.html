@@ -25,15 +25,27 @@
     padding-top: 15px;
   }
 
-.table {
-  margin-top: 130px;
+.table-container {
+  max-height: 83vh;
+  overflow-y: auto;
+  margin-top: 13vh;
+}
+
+.table-header {
+  position: sticky;
+  top: 0;
+  background-color: white;
+}
+
+.table th {
+  border-top: 0px;
 }
 
 </style>
 
 <div id="header" class="header">
   {% if event.started_at %}
-  Do konca zostáva: <div id="countdown" class="countdown"></div>
+  Do konca zostáva: <span id="countdown" class="countdown"></span>
   {% else %}
   Súťaž ešte nezačala
   {% endif %}
@@ -78,38 +90,40 @@
   {% endif %}
 </div>
 
-<table class="table" id="my-table">
-  <thead class="table-header">
-    <tr>
-      <th scope="col">Poradie</th>
-      <th scope="col">Názov tímu</th>
-      <th scope="col">Škola</th>
-      <th scope="col">Účastníci</th>
-      <th scope="col">Bonifikácia</th>
-      {% for category in categories %}
-      <th scope="col">{{ category.name }}</th>
+<div class="table-container">
+  <table class="table" id="my-table">
+    <thead class="table-header">
+      <tr>
+        <th scope="col">Poradie</th>
+        <th scope="col">Názov tímu</th>
+        <th scope="col">Škola</th>
+        <th scope="col">Účastníci</th>
+        <th scope="col">Bonifikácia</th>
+        {% for category in categories %}
+        <th scope="col">{{ category.name }}</th>
+        {% endfor %}
+        <th scope="col">Úlohy</th>
+        <th scope="col">Spolu</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for team in teams %}
+      <tr>
+        <th scope="row">{{ team.rank }}</th>
+        <td>{{ team.name }}</td>
+        <td>{{ team.school }}</td>
+        <td>{{ team.members }}</td>
+        <td>{{ team.compensation|floatformat:1 }}</td>
+        {% for count in team.solved_by_category %}
+        <td>{{ count }}</td>
+        {% endfor %}
+        <td>{{ team.problem_points|floatformat:1 }}</td>
+        <td>{{ team.total_points|floatformat:1 }}</td>
+      </tr>
       {% endfor %}
-      <th scope="col">Úlohy</th>
-      <th scope="col">Spolu</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for team in teams %}
-    <tr>
-      <th scope="row">{{ team.rank }}</th>
-      <td>{{ team.name }}</td>
-      <td>{{ team.school }}</td>
-      <td>{{ team.members }}</td>
-      <td>{{ team.compensation|floatformat:1 }}</td>
-      {% for count in team.solved_by_category %}
-      <td>{{ count }}</td>
-      {% endfor %}
-      <td>{{ team.problem_points|floatformat:1 }}</td>
-      <td>{{ team.total_points|floatformat:1 }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+    </tbody>
+  </table>
+</div>
 <script>
   var countdownTime = new Date('{{ event.end_time.isoformat }}').getTime();  // this has to be a part of the html template to use context
   setCountdown();
