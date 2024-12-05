@@ -45,13 +45,9 @@
     {% else %}
     Súťaž ešte nezačala
     {% endif %}
-    {% if request.user.is_staff %}
+    {% if request.user.is_staff and not is_public %}
       <div class="row">
-        {% if is_public %}
-          <form action="{% url 'competition:public-results' event.pk %}" method="POST" class="m-2">
-        {% else %}
           <form action="{% url 'competition:results' event.pk %}" method="POST" class="m-2">
-        {% endif %}
           {% csrf_token %}
           <input type="hidden" id="freeze" name="freeze" value="True">
           <button type="submit" class="main-button">
@@ -80,7 +76,7 @@
           </form>
         {% endif %}
       </div>
-      {% endif %}
+    {% endif %}
     {% if event.frozen_results %}
       <div>Výsledky sú zmrazené. Skutočné výsledky zobrazíme až po súťaži.</div>
     {% endif %}
