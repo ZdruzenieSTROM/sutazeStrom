@@ -2,12 +2,6 @@
 
 {% block title %}{{ event }} &ndash; Výsledky{% endblock %}
 
-
-{% block meta %}
-<meta http-equiv="refresh" content="30" />
-{% endblock %}
-
-
 {% block navbar %}
 {% if request.user.is_staff %}
 {{ block.super }}
@@ -90,8 +84,8 @@
   {% endif %}
 </div>
 
-<div class="table-container">
-  <table class="table" id="my-table">
+<div class="table-container" id="table-container">
+  <table class="table" id="results-table">
     <thead class="table-header">
       <tr>
         <th scope="col">Poradie</th>

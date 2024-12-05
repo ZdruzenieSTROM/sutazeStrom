@@ -1,26 +1,20 @@
 function autoScroll() {
-    let scrollStep = 2;
-    let pauseDuration = 4000;
-    let isPaused = false;
+    const tableContainer = document.getElementById("table-container")
+    const scrollStep = tableContainer.clientHeight - 100;
+    const pauseDuration = 15000;
 
     function scroll() {
-        if (isPaused) return;
-
-        window.scrollTo(0, window.scrollY + scrollStep);
-
-        if (window.scrollY + window.innerHeight >= document.body.scrollHeight || window.scrollY <= 0) {
-            scrollStep *= -1;
-
-            isPaused = true;
-                setTimeout(() => {
-                isPaused = false;
-                requestAnimationFrame(scroll);
-            }, pauseDuration);
-            return;
+        if (tableContainer.scrollTop + tableContainer.clientHeight >= tableContainer.scrollHeight) {
+            location.reload(); // Refetches the results data and scrolls to the top as a side effect
         }
-
-        requestAnimationFrame(scroll);
+        
+        tableContainer.scrollBy({top: scrollStep, behavior: 'smooth'});
+        setTimeout(() => {
+            scroll();
+        }, pauseDuration);
     }
 
-    scroll();
+    setTimeout(() => {
+        scroll();
+    }, pauseDuration);
 }
