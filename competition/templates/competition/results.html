@@ -11,112 +11,115 @@
 {% block content %}
 
 <style>
-  .header {
-    position: fixed;
-    width: inherit;
-    background-color: white;
-    margin-top: -15px;
-    padding-top: 15px;
+  .results-container {
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
   }
 
-.table-container {
-  max-height: 83vh;
-  overflow-y: auto;
-  margin-top: 13vh;
-}
+  .header {
+    background-color: white;
+  }
 
-.table-header {
-  position: sticky;
-  top: 0;
-  background-color: white;
-}
+  .table-container {
+    overflow-y: auto;
+  }
 
-.table th {
-  border-top: 0px;
-}
+  .table-header {
+    position: sticky;
+    top: 0;
+    background-color: white;
+  }
+
+  .table th {
+    border-top: 0px;
+  }
 
 </style>
 
-<div id="header" class="header">
-  {% if event.started_at %}
-  Do konca zostáva: <span id="countdown" class="countdown"></span>
-  {% else %}
-  Súťaž ešte nezačala
-  {% endif %}
-  {% if request.user.is_staff %}
-    <div class="row">
-      {% if is_public %}
-        <form action="{% url 'competition:public-results' event.pk %}" method="POST" class="m-2">
-      {% else %}
-        <form action="{% url 'competition:results' event.pk %}" method="POST" class="m-2">
-      {% endif %}
-        {% csrf_token %}
-        <input type="hidden" id="freeze" name="freeze" value="True">
-        <button type="submit" class="main-button">
-          <span aria-hidden="true">
-            {% if event.frozen_results %}
-              Aktualizuj zmrazené výsledky
-            {% else %}
-              Zmraz aktuálne výsledky
-            {% endif %}
-          </span>
-        </button>
-      </form>
-      {% if event.frozen_results %}
-          {% if is_public %}
-            <form action="{% url 'competition:public-results' event.pk %}" method="POST" class="m-2">
-          {% else %}
-            <form action="{% url 'competition:results' event.pk %}" method="POST" class="m-2">
-          {% endif %}
+<div class="results-container">
+  <div id="header" class="header">
+    {% if event.started_at %}
+    Do konca zostáva: <span id="countdown" class="countdown"></span>
+    {% else %}
+    Súťaž ešte nezačala
+    {% endif %}
+    {% if request.user.is_staff %}
+      <div class="row">
+        {% if is_public %}
+          <form action="{% url 'competition:public-results' event.pk %}" method="POST" class="m-2">
+        {% else %}
+          <form action="{% url 'competition:results' event.pk %}" method="POST" class="m-2">
+        {% endif %}
           {% csrf_token %}
-          <input type="hidden" id="freeze2" name="freeze" value="False">
+          <input type="hidden" id="freeze" name="freeze" value="True">
           <button type="submit" class="main-button">
             <span aria-hidden="true">
-              Rozmraz aktuálne výsledky
+              {% if event.frozen_results %}
+                Aktualizuj zmrazené výsledky
+              {% else %}
+                Zmraz aktuálne výsledky
+              {% endif %}
             </span>
           </button>
         </form>
+        {% if event.frozen_results %}
+            {% if is_public %}
+              <form action="{% url 'competition:public-results' event.pk %}" method="POST" class="m-2">
+            {% else %}
+              <form action="{% url 'competition:results' event.pk %}" method="POST" class="m-2">
+            {% endif %}
+            {% csrf_token %}
+            <input type="hidden" id="freeze2" name="freeze" value="False">
+            <button type="submit" class="main-button">
+              <span aria-hidden="true">
+                Rozmraz aktuálne výsledky
+              </span>
+            </button>
+          </form>
+        {% endif %}
+      </div>
       {% endif %}
-    </div>
+    {% if event.frozen_results %}
+      <div>Výsledky sú zmrazené. Skutočné výsledky zobrazíme až po súťaži.</div>
     {% endif %}
-  {% if event.frozen_results %}
-    <div>Výsledky sú zmrazené. Skutočné výsledky zobrazíme až po súťaži.</div>
-  {% endif %}
-</div>
+  </div>
 
-<div class="table-container" id="table-container">
-  <table class="table" id="results-table">
-    <thead class="table-header">
-      <tr>
-        <th scope="col">Poradie</th>
-        <th scope="col">Názov tímu</th>
-        <th scope="col">Škola</th>
-        <th scope="col">Účastníci</th>
-        <th scope="col">Bonifikácia</th>
-        {% for category in categories %}
-        <th scope="col">{{ category.name }}</th>
+  <div class="table-container" id="table-container">
+    <table class="table" id="results-table">
+      <thead class="table-header">
+        <tr>
+          <th scope="col">Poradie</th>
+          <th scope="col">Názov tímu</th>
+          <th scope="col">Škola</th>
+          <th scope="col">Účastníci</th>
+          <th scope="col">Bonifikácia</th>
+          {% for category in categories %}
+          <th scope="col">{{ category.name }}</th>
+          {% endfor %}
+          <th scope="col">Úlohy</th>
+          <th scope="col">Spolu</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for team in teams %}
+        <tr>
+          <th scope="row">{{ team.rank }}</th>
+          <td>{{ team.name }}</td>
+          <td>{{ team.school }}</td>
+          <td>{{ team.members }}</td>
+          <td>{{ team.compensation|floatformat:1 }}</td>
+          {% for count in team.solved_by_category %}
+          <td>{{ count }}</td>
+          {% endfor %}
+          <td>{{ team.problem_points|floatformat:1 }}</td>
+          <td>{{ team.total_points|floatformat:1 }}</td>
+        </tr>
         {% endfor %}
-        <th scope="col">Úlohy</th>
-        <th scope="col">Spolu</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for team in teams %}
-      <tr>
-        <th scope="row">{{ team.rank }}</th>
-        <td>{{ team.name }}</td>
-        <td>{{ team.school }}</td>
-        <td>{{ team.members }}</td>
-        <td>{{ team.compensation|floatformat:1 }}</td>
-        {% for count in team.solved_by_category %}
-        <td>{{ count }}</td>
-        {% endfor %}
-        <td>{{ team.problem_points|floatformat:1 }}</td>
-        <td>{{ team.total_points|floatformat:1 }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      </tbody>
+    </table>
+  </div>
 </div>
 <script>
   var countdownTime = new Date('{{ event.end_time.isoformat }}').getTime();  // this has to be a part of the html template to use context
