@@ -6,7 +6,7 @@ services:
     ports:
       - "127.0.0.1:8720:8000"
     volumes:
-      - "staticfiles:/app/static"
+      - "staticfiles:/app/static:rw"
       - type: "bind"
         source: "/data/www/sutazeStrom/db.sqlite3"
         target: "/app/db.sqlite3"
@@ -16,7 +16,7 @@ services:
     restart: always
 
   static:
-    image: "nginx:1.23"
+    image: "nginx:1.25"
     depends_on:
       - "website"
     ports:
