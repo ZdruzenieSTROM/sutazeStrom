@@ -9,10 +9,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           path: sutazeStrom
-      - uses: wshihadeh/docker-deployment-action@v2
-        with:
-          remote_docker_host: webstrom@server.strom.sk
-          ssh_private_key: ${{ secrets.WEBSTROM_DEPLOY_SSH_PRIVATE_KEY }}
-          ssh_public_key: ${{ secrets.WEBSTROM_DEPLOY_SSH_PUBLIC_KEY }}
-          stack_file_name: sutazeStrom/compose.yaml
-          args: up --build --force-recreate --detach
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.WEBSTROM_DEPLOY_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan server.strom.sk >> ~/.ssh/known_hosts
+
+      - name: Deploy
+        env:
+          DOCKER_HOST: ssh://webstrom@server.strom.sk
+        run: docker compose -f sutazeStrom/compose.yaml up --build --force-recreate --detach
