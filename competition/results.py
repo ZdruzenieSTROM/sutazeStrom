@@ -1,4 +1,3 @@
-
 import datetime
 from decimal import Decimal
 from operator import itemgetter
@@ -9,6 +8,8 @@ from django.db.models.manager import BaseManager
 
 from .models import Compensation, Event, ProblemCategory, Solution, Team
 
+LOMIHLAV_NUMBER_OF_TEAM_MEMBERS = 4
+LOMIHLAV_MIN_SCHOOL_CLASS = 7
 
 def get_latest_solution_or_none(team: Team, event: Event) -> datetime.datetime | None:
     try:
@@ -40,8 +41,8 @@ def build_team_dict(team: Team, event: Event, categories: BaseManager[ProblemCat
 
     if event.name == 'LOMIHLAV':
         member_count = team.participant_set.count()
-        if member_count < 4:
-            team_dict['compensation'] += (4 - member_count) * Compensation.objects.get(event=event, school_class='7').points
+        if member_count < LOMIHLAV_NUMBER_OF_TEAM_MEMBERS:
+            team_dict['compensation'] += (LOMIHLAV_NUMBER_OF_TEAM_MEMBERS - member_count) * Compensation.objects.get(event=event, school_class=LOMIHLAV_MIN_SCHOOL_CLASS).points
 
     return team_dict
 
