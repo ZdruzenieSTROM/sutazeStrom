@@ -13,6 +13,7 @@ from .models import (Compensation, Event, Participant, ProblemCategory,
 # TODO: come up with slightly better control digits,
 # possibly move them to settings file
 CONTROL = [5, 1, 9, 3, 7]
+LOMIHLAV_INITIAL_NUMBER_OF_PROBLEMS = 6
 
 
 class BarcodeForm(forms.Form):
@@ -127,7 +128,7 @@ class SubmitForm(BarcodeForm):
 
         return solution
 
-
+# Zatiaľ len pre Lomihlav
 class CheckForm(BarcodeForm):
     def clean(self):
         cleaned_data = super().clean()
@@ -146,7 +147,7 @@ class CheckForm(BarcodeForm):
 
         # Špecifické číslo pre Lomihlav
         # TODO: zovšeobecniť pre Mamut
-        expected_position = solved_in_category + 7 
+        expected_position = solved_in_category + LOMIHLAV_INITIAL_NUMBER_OF_PROBLEMS + 1
         cleaned_data['warning'] = ''
 
         if category.name == 'Hádanky' or category.name == 'Hlavolamy':
