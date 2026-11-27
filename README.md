@@ -47,32 +47,13 @@ Create virtual enviroment
 ```cmd
 virtualenv ENV_NAME
 ```
-Install dependencies:
-```cmd
-pip install -r requirements.txt
-```
 
 and allow remote access for desired `PORT_NUMBER` (e. g. 8080):
 ```bash
 iptables -I INPUT -p tcp -m tcp --dport PORT_NUMBER -j ACCEPT
 ```
 
-## Base database creation
-
-Make and then apply migrations. You can do it by typing:
-
-```
-manage.py makemigrations competition
-```
-```
-manage.py migrate
-```
-
-to your CMD or Bash into `sutazeStrom` directory.
-
-
-## Run server
-
+## Install dependencies
 ### Windows machine
 
 In CMD:
@@ -82,9 +63,9 @@ In CMD:
 ```cmd
 ENV_NAME\Scripts\activate
 ```
-3. Run server on your desired port:
+3. Install dependencies:
 ```cmd
-python manage.py runserver 0.0.0.0:PORT_NUMBER
+pip install -r requirements.txt
 ```
 
 ### Linux machine
@@ -98,7 +79,27 @@ In Terminal:
 ```bash
 source ENV_NAME/bin/activate
 ```
-4. Run server on your desired port:
+4. Install dependencies:
+```cmd
+pip install -r requirements.txt
+```
+
+## Base database creation
+
+Make and then apply migrations. You can do it by typing:
+
+```
+python manage.py makemigrations competition
+```
+```
+python manage.py migrate
+```
+
+to your CMD or Bash into `sutazeStrom` directory.
+
+
+## Run server
+Run server on your desired port:
 ```bash
 python manage.py runserver 0.0.0.0:PORT_NUMBER
 ```
