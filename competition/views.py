@@ -1,6 +1,7 @@
 import csv
 import json
 from functools import wraps
+from itertools import repeat
 
 from django.conf import settings
 from django.contrib import messages
@@ -232,11 +233,14 @@ class CertificatesView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        hide_grades = self.request.GET.get('hide_grades') == '1'
+        grades = not hide_grades
+        context['hide_grades'] = hide_grades
         _, teams = generate_results(self.object)
         context['team_certificates'] = map(
-            self.format_team_certificate, teams)
+            self.format_team_certificate, teams, repeat(grades))
         context['members_certificates'] = map(
-            self.format_members_certificate, teams)
+            self.format_members_certificate, teams, repeat(grades))
         return context
 
     @staticmethod
@@ -246,21 +250,25 @@ class CertificatesView(DetailView):
         return rank
 
     @staticmethod
-    def format_members(members: str) -> str:
+    def format_members(members: str, grades=True) -> str:
         members = members.split(',')
+        if not grades:
+            members = [member.split(' (')[0] for member in members]
         if len(members) > 1:
-            return ' \\& '.join([', '.join(members[:-1]), members[-1]])
+            return ' a '.join([', '.join(members[:-1]), members[-1]])
         return members
 
     @classmethod
-    def format_team_certificate(cls, team: dict) -> str:
-        members = cls.format_members(team['members'])
+    def format_team_certificate(cls, team: dict, grades: bool = True) -> str:
+        members = cls.format_members(team['members'], grades=grades)
         rank = cls.format_rank(team['rank'])
         return f'\\diplom{{{rank}}}{{{team["school"]}}}{{{members}}}'
 
     @classmethod
-    def format_members_certificate(cls, team: dict) -> list[str]:
+    def format_members_certificate(cls, team: dict, grades: bool = True) -> list[str]:
         members: list[str] = team['members'].split(',')
+        if not grades:
+            members = [member.split(' (')[0] for member in members]
         rank = cls.format_rank(team['rank'])
         return [f'\\diplom{{{rank}}}{{{member.strip()}}}{{}}' for member in members]
 

@@ -9,6 +9,19 @@
 {% block content %}
 <h1>{{ event }} - diplomy</h1>
 
+<form method="get">
+    <label style="cursor: pointer; user-select: none;">
+        <input 
+            type="checkbox" 
+            name="hide_grades" 
+            value="1" 
+            onchange="this.form.submit()"
+            {% if hide_grades %}checked{% endif %}
+        >
+        Skryť ročníky
+    </label>
+</form>
+
 <h2>Tímové diplomy</h2>
 <div>
     {% for certificate in team_certificates %}
