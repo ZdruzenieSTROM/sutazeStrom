@@ -2,7 +2,7 @@
 
 from django.urls import path
 
-from competition.views import (CertificatesView, CSVResultsView,
+from competition.views import (CertificatesView, CSVResultsView, CheckFormView,
                                EventDetailView, EventListView, ExportView,
                                ImportFormView, InitializeView,
                                LatestPublicResultsView, PublicResultsView,
@@ -19,6 +19,8 @@ urlpatterns = [
     path('<int:pk>/', nonstaff_redirect_to_public_results(EventDetailView.as_view()), name='event'),
     path('<int:pk>/submit/',
          nonstaff_redirect_to_public_results(SubmitFormView.as_view()), name='submit'),
+     path('<int:pk>/check/',
+          nonstaff_redirect_to_public_results(CheckFormView.as_view()), name='check'),
     path('<int:pk>/results/',
          nonstaff_redirect_to_public_results(ResultsView.as_view()), name='results'),
     path('priebezne-vysledky',

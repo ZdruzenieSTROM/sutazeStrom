@@ -15,9 +15,8 @@ from .models import (Compensation, Event, Participant, ProblemCategory,
 CONTROL = [5, 1, 9, 3, 7]
 
 
-class SubmitForm(forms.Form):
-    require_control_sum = forms.BooleanField(
-        label="Vyžadovať kontrolný súčet", required=False, initial=True)
+class BarcodeForm(forms.Form):
+    require_control_sum = forms.BooleanField(label="Vyžadovať kontrolný súčet", required=False, initial=True)
     event = forms.ModelChoiceField(
         Event.objects.all(), widget=forms.HiddenInput())
     code = forms.CharField(max_length=6, label='', required=True)
@@ -54,7 +53,7 @@ class SubmitForm(forms.Form):
             code = code[:-1]
 
         return reduce(lambda p, n: p*10 + n, code)
-
+    
     def clean(self):
         cleaned_data = super().clean()
 
@@ -96,15 +95,29 @@ class SubmitForm(forms.Form):
 
         self.cleaned_data['team'] = team
 
+        return cleaned_data
+
+
+class SubmitForm(BarcodeForm):
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if self.errors:
+            return cleaned_data
+        
         solution = Solution.objects.filter(
-            team=team, problem_category=category, problem_position=position)
+            team=cleaned_data['team'],
+            problem_category=cleaned_data['problem_category'],
+            problem_position=cleaned_data['problem_position'],
+        )
 
         if solution.exists():
             raise forms.ValidationError(
                 f'Táto úloha už bola odovzdaná v čase '
-                f'{ solution.first().time.strftime("%H:%M:%S (%d. %m. %Y)") }! ({ code })')
+                f'{ solution.first().time.strftime("%H:%M:%S (%d. %m. %Y)") }! ({ cleaned_data["code"] })')
 
         return cleaned_data
+
 
     def save(self):
         solution = Solution.objects.create(
@@ -113,6 +126,48 @@ class SubmitForm(forms.Form):
             problem_position=self.cleaned_data['problem_position'])
 
         return solution
+
+
+class CheckForm(BarcodeForm):
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if self.errors:
+            return cleaned_data
+
+        team = cleaned_data['team']
+        category = cleaned_data['problem_category']
+        position = cleaned_data['problem_position']
+
+        solved_in_category = Solution.objects.filter(
+            team=team,
+            problem_category=category,
+        ).count()
+
+        # Špecifické číslo pre Lomihlav
+        # TODO: zovšeobecniť pre Mamut
+        expected_position = solved_in_category + 7 
+        cleaned_data['warning'] = ''
+
+        if category.name == 'Hádanky' or category.name == 'Hlavolamy':
+            raise forms.ValidationError(
+                'Navrchu zadaní by nemala byť hádanka ani hlavolam, ale úloha.'
+            )
+
+        if position > expected_position:
+            raise forms.ValidationError(
+                f'Nesedí číslo úlohy v kategórii {category.name}! '
+                f'Tím {team.name} má odovzdaných {solved_in_category} úloh, '
+                f'očakávala sa úloha č. {expected_position}, ale naskenovala sa č. {position}.'
+            )
+        elif position < expected_position:
+            cleaned_data['warning'] = (
+                f'Číslo úlohy v kategórii {category.name} je nižšie, než sa očakávalo! '
+                f'Tím {team.name} má odovzdaných {solved_in_category} úloh, '
+                f'očakávala sa úloha č. {expected_position}, ale naskenovala sa č. {position}.'
+            )
+
+        return cleaned_data
 
 
 class InitializeForm(forms.ModelForm):

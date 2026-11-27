@@ -17,7 +17,7 @@ from django.views.generic.edit import FormView
 
 from datetime import timedelta
 
-from .forms import ImportForm, InitializeForm, SubmitForm
+from .forms import ImportForm, InitializeForm, SubmitForm, CheckForm
 from .models import Event, ProblemCategory, Solution, Team
 from .results import generate_results
 
@@ -99,7 +99,16 @@ class InitializeView(FormView):
         return super().form_valid(form)
 
 
-class SubmitFormView(SingleObjectFormView):
+class BarForm(SingleObjectFormView):
+    def form_invalid(self, form):
+        data = form.data.copy()
+        data['code'] = ''
+        form.data = data
+
+        return super().form_invalid(form)
+
+
+class SubmitFormView(BarForm):
     model = Event
     context_object_name = 'event'
 
@@ -132,12 +141,33 @@ class SubmitFormView(SingleObjectFormView):
 
         return super().form_valid(form)
 
-    def form_invalid(self, form):
-        data = form.data.copy()
-        data['code'] = ''
-        form.data = data
+class CheckFormView(BarForm):
+    model = Event
+    context_object_name = 'event'
 
-        return super().form_invalid(form)
+    template_name = 'competition/check.html'
+
+    form_class = CheckForm
+
+    object_field_name = 'event'
+
+    def get_success_url(self):
+        return reverse('competition:check', kwargs={'pk': self.kwargs['pk']})
+
+    def form_valid(self, form):
+        if form.cleaned_data['warning']:
+            messages.warning(
+                self.request,
+                form.cleaned_data['warning']
+            )
+        else:
+            messages.success(
+                self.request,
+                f'Tím {form.cleaned_data["team"]} má správne započítané body za úlohy'
+            )
+
+        return super().form_valid(form)
+
 
 
 class ResultsView(DetailView):
