@@ -188,7 +188,7 @@ class PublicResultsView(ResultsView):
         return context
 
 
-class LatestPublicResultsView(ResultsView):
+class LatestPublicResultsView(PublicResultsView):
     def get_object(self):
         return Event.objects.latest()
 
